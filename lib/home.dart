@@ -42,7 +42,7 @@ class HomeScreenState extends State<HomeScreen> {
   int _limitIncrement = 20;
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: 'Settings', icon: Icons.settings),
+    const Choice(title: '식물 등록', icon: Icons.settings),
     const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
@@ -292,6 +292,13 @@ class HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
             //List
             Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/main2.jpg"),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.5), BlendMode.multiply)),
+              ),
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('users')
@@ -318,79 +325,6 @@ class HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            // Container(
-            //   child: FlatButton(
-            //     child: Row(
-            //       children: <Widget>[
-            //         Material(
-            //           child: "" != null
-            //               ? CachedNetworkImage(
-            //                   placeholder: (context, url) => Container(
-            //                     child: CircularProgressIndicator(
-            //                       strokeWidth: 1.0,
-            //                       valueColor:
-            //                           AlwaysStoppedAnimation<Color>(themeColor),
-            //                     ),
-            //                     width: 50.0,
-            //                     height: 50.0,
-            //                     padding: EdgeInsets.all(15.0),
-            //                   ),
-            //                   imageUrl: "",
-            //                   width: 50.0,
-            //                   height: 50.0,
-            //                   fit: BoxFit.cover,
-            //                 )
-            //               : Icon(
-            //                   Icons.account_circle,
-            //                   size: 50.0,
-            //                   color: greyColor,
-            //                 ),
-            //           borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            //           clipBehavior: Clip.hardEdge,
-            //         ),
-            //         Flexible(
-            //           child: Container(
-            //             child: Column(
-            //               children: <Widget>[
-            //                 Container(
-            //                   child: Text(
-            //                     'Nickname: ${'나의 식물 친구'}',
-            //                     style: TextStyle(color: primaryColor),
-            //                   ),
-            //                   alignment: Alignment.centerLeft,
-            //                   margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-            //                 ),
-            //                 Container(
-            //                   child: Text(
-            //                     'About me: ${'나만의 식물 친구'}',
-            //                     style: TextStyle(color: primaryColor),
-            //                   ),
-            //                   alignment: Alignment.centerLeft,
-            //                   margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-            //                 )
-            //               ],
-            //             ),
-            //             margin: EdgeInsets.only(left: 20.0),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //     onPressed: () {
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (context) => Chat(
-            //                     peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
-            //                     peerAvatar: "",
-            //                   )));
-            //     },
-            //     color: greyColor2,
-            //     padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(10.0)),
-            //   ),
-            //   margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-            // ),
 
             // Loading
             Positioned(
@@ -476,31 +410,52 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            Row(children: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Chat(
-                                  peerId: document.get('plantNick'),
-                                  peerAvatar: document.get('plantUrl'),
-                                )));
-                  },
-                  child: Text(
-                    "식물 채팅",
-                    style: TextStyle(color: primaryColor),
-                  )),
-              FlatButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => PlantSound()));
-                  },
-                  child: Text(
-                    "식물 소리",
-                    style: TextStyle(color: primaryColor),
-                  )),
-            ]),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <
+                Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Chat(
+                                peerId: document.get('plantNick'),
+                                peerAvatar: document.get('plantUrl'),
+                              )));
+                },
+                child: Text(
+                  '식물 채팅',
+                  style: TextStyle(color: AppColors.purple),
+                  textAlign: TextAlign.center,
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      EdgeInsets.only(top: 10, bottom: 10, left: 40, right: 40),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => PlantSound()));
+                },
+                child: Text(
+                  '식물 소리',
+                  style: TextStyle(color: AppColors.purple),
+                  textAlign: TextAlign.center,
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding:
+                      EdgeInsets.only(top: 10, bottom: 10, left: 40, right: 40),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
+                ),
+              ),
+            ])
           ],
         ),
         color: greyColor2,

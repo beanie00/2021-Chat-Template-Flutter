@@ -10,14 +10,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'constants/app_colors.dart';
+
 class ChatSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.purple,
         title: Text(
-          'SETTINGS',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          '식물 등록',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -305,7 +308,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 child: FlatButton(
                   onPressed: handleUpdateData,
                   child: Text(
-                    'UPDATE',
+                    '등록하기',
                     style: TextStyle(fontSize: 16.0),
                   ),
                   color: primaryColor,

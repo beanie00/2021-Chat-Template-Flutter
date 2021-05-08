@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
             final state = snapshot.data;
             if ((state == BluetoothState.on) || (kDebugMode)) {
               return SplashScreen();
-              // return FindDevicesScreen(); // example code
+              // return (); // example code
             }
             return BluetoothOffScreen();
           }),
