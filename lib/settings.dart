@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_demo/const.dart';
+import 'package:dearplant/const.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -82,54 +82,54 @@ class SettingsScreenState extends State<SettingsScreen> {
         isLoading = true;
       });
     }
-    uploadFile();
+    //uploadFile();
   }
 
-  Future uploadFile() async {
-    String fileName = id;
-    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
-    StorageTaskSnapshot storageTaskSnapshot;
-    uploadTask.onComplete.then((value) {
-      if (value.error == null) {
-        storageTaskSnapshot = value;
-        storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-          photoUrl = downloadUrl;
-          FirebaseFirestore.instance.collection('users').doc(id).update({
-            'nickname': nickname,
-            'aboutMe': aboutMe,
-            'photoUrl': photoUrl
-          }).then((data) async {
-            await prefs.setString('photoUrl', photoUrl);
-            setState(() {
-              isLoading = false;
-            });
-            Fluttertoast.showToast(msg: "Upload success");
-          }).catchError((err) {
-            setState(() {
-              isLoading = false;
-            });
-            Fluttertoast.showToast(msg: err.toString());
-          });
-        }, onError: (err) {
-          setState(() {
-            isLoading = false;
-          });
-          Fluttertoast.showToast(msg: 'This file is not an image');
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(msg: 'This file is not an image');
-      }
-    }, onError: (err) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: err.toString());
-    });
-  }
+  // Future uploadFile() async {
+  //   String fileName = id;
+  //   StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+  //   StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
+  //   StorageTaskSnapshot storageTaskSnapshot;
+  //   uploadTask.onComplete.then((value) {
+  //     if (value.error == null) {
+  //       storageTaskSnapshot = value;
+  //       storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+  //         photoUrl = downloadUrl;
+  //         FirebaseFirestore.instance.collection('users').doc(id).update({
+  //           'nickname': nickname,
+  //           'aboutMe': aboutMe,
+  //           'photoUrl': photoUrl
+  //         }).then((data) async {
+  //           await prefs.setString('photoUrl', photoUrl);
+  //           setState(() {
+  //             isLoading = false;
+  //           });
+  //           Fluttertoast.showToast(msg: "Upload success");
+  //         }).catchError((err) {
+  //           setState(() {
+  //             isLoading = false;
+  //           });
+  //           Fluttertoast.showToast(msg: err.toString());
+  //         });
+  //       }, onError: (err) {
+  //         setState(() {
+  //           isLoading = false;
+  //         });
+  //         Fluttertoast.showToast(msg: 'This file is not an image');
+  //       });
+  //     } else {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //       Fluttertoast.showToast(msg: 'This file is not an image');
+  //     }
+  //   }, onError: (err) {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //     Fluttertoast.showToast(msg: err.toString());
+  //   });
+  // }
 
   void handleUpdateData() {
     focusNodeNickname.unfocus();
