@@ -9,9 +9,10 @@ import 'package:dearplant/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dearplant/chat.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key key, this.title}) : super(key: key);
+  LoginScreen({Key key, @required this.title}) : super(key: key);
 
   final String title;
 
@@ -47,6 +48,10 @@ class LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
+                //Chat(
+                //       peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
+                //       peerAvatar: "",
+                //     )),
                 HomeScreen(currentUserId: prefs.getString('id'))),
       );
     }
@@ -72,7 +77,7 @@ class LoginScreenState extends State<LoginScreen> {
     // );
 
     User firebaseUser = (await firebaseAuth.createUserWithEmailAndPassword(
-            email: "12346@gmail.com", password: "Apple123!"))
+            email: "12345@gmail.com", password: "Apple123!"))
         .user;
     if (firebaseUser != null) {
       // Check is already sign up
@@ -117,6 +122,10 @@ class LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(
               builder: (context) =>
                   HomeScreen(currentUserId: firebaseUser.uid)));
+      // Chat(
+      //   peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
+      //   peerAvatar: "",
+      // )));
     } else {
       Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {

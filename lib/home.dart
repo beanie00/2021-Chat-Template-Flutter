@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:dearplant/chat.dart';
 import 'package:dearplant/const.dart';
 import 'package:dearplant/settings.dart';
+import 'package:dearplant/screens/home_screen.dart';
 import 'package:dearplant/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'constants/app_colors.dart';
 import 'main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -252,9 +254,10 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.purple,
         title: Text(
           '나의 식물 친구',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: <Widget>[
@@ -287,11 +290,13 @@ class HomeScreenState extends State<HomeScreen> {
       body: WillPopScope(
         child: Stack(
           children: <Widget>[
-            // List
+            //List
             Container(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('users')
+                    .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+                    .collection('PlantInventory')
                     .limit(_limit)
                     .snapshots(),
                 builder: (context, snapshot) {
@@ -313,6 +318,79 @@ class HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
+            // Container(
+            //   child: FlatButton(
+            //     child: Row(
+            //       children: <Widget>[
+            //         Material(
+            //           child: "" != null
+            //               ? CachedNetworkImage(
+            //                   placeholder: (context, url) => Container(
+            //                     child: CircularProgressIndicator(
+            //                       strokeWidth: 1.0,
+            //                       valueColor:
+            //                           AlwaysStoppedAnimation<Color>(themeColor),
+            //                     ),
+            //                     width: 50.0,
+            //                     height: 50.0,
+            //                     padding: EdgeInsets.all(15.0),
+            //                   ),
+            //                   imageUrl: "",
+            //                   width: 50.0,
+            //                   height: 50.0,
+            //                   fit: BoxFit.cover,
+            //                 )
+            //               : Icon(
+            //                   Icons.account_circle,
+            //                   size: 50.0,
+            //                   color: greyColor,
+            //                 ),
+            //           borderRadius: BorderRadius.all(Radius.circular(25.0)),
+            //           clipBehavior: Clip.hardEdge,
+            //         ),
+            //         Flexible(
+            //           child: Container(
+            //             child: Column(
+            //               children: <Widget>[
+            //                 Container(
+            //                   child: Text(
+            //                     'Nickname: ${'나의 식물 친구'}',
+            //                     style: TextStyle(color: primaryColor),
+            //                   ),
+            //                   alignment: Alignment.centerLeft,
+            //                   margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+            //                 ),
+            //                 Container(
+            //                   child: Text(
+            //                     'About me: ${'나만의 식물 친구'}',
+            //                     style: TextStyle(color: primaryColor),
+            //                   ),
+            //                   alignment: Alignment.centerLeft,
+            //                   margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+            //                 )
+            //               ],
+            //             ),
+            //             margin: EdgeInsets.only(left: 20.0),
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //     onPressed: () {
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) => Chat(
+            //                     peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
+            //                     peerAvatar: "",
+            //                   )));
+            //     },
+            //     color: greyColor2,
+            //     padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(10.0)),
+            //   ),
+            //   margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+            // ),
 
             // Loading
             Positioned(
@@ -326,88 +404,117 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (document.get('id') == currentUserId) {
-      return Container();
-    } else {
-      return Container(
-        child: FlatButton(
-          child: Row(
-            children: <Widget>[
-              Material(
-                child: document.get('photoUrl') != null
-                    ? CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(themeColor),
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(
+            color: greyColor2,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Container(
+        child: Column(
+          children: [
+            Row(
+              children: <Widget>[
+                Material(
+                  child: document.get('plantUrl') != null
+                      ? CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.0,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(themeColor),
+                            ),
+                            width: 50.0,
+                            height: 50.0,
+                            padding: EdgeInsets.all(15.0),
                           ),
+                          imageUrl: document.get('plantUrl'),
                           width: 50.0,
                           height: 50.0,
-                          padding: EdgeInsets.all(15.0),
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.account_circle,
+                          size: 50.0,
+                          color: greyColor,
                         ),
-                        imageUrl: document.get('photoUrl'),
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: greyColor,
-                      ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
-              ),
-              Flexible(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          'Nickname: ${document.get('nickname')}',
-                          style: TextStyle(color: primaryColor),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                      ),
-                      Container(
-                        child: Text(
-                          'About me: ${document.get('aboutMe') ?? 'Not available'}',
-                          style: TextStyle(color: primaryColor),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 20.0),
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
                 ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Chat(
-                          peerId: document.id,
-                          peerAvatar: document.get('photoUrl'),
-                        )));
-          },
-          color: greyColor2,
-          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                Flexible(
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          child: Text(
+                            '별명: ${document.get('plantNick')}',
+                            style: TextStyle(color: primaryColor),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                        ),
+                        Container(
+                          child: Text(
+                            '식물종: ${document.get('plantName') ?? 'Not available'}',
+                            style: TextStyle(color: primaryColor),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                        ),
+                        Container(
+                          child: Text(
+                            '수분량: ${document.get('watering')}',
+                            style: TextStyle(color: primaryColor),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                        )
+                      ],
+                    ),
+                    margin: EdgeInsets.only(left: 20.0),
+                  ),
+                ),
+              ],
+            ),
+            Row(children: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Chat(
+                                  peerId: document.get('plantNick'),
+                                  peerAvatar: document.get('plantUrl'),
+                                )));
+                  },
+                  child: Text(
+                    "식물 채팅",
+                    style: TextStyle(color: primaryColor),
+                  )),
+              FlatButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => PlantSound()));
+                  },
+                  child: Text(
+                    "식물 소리",
+                    style: TextStyle(color: primaryColor),
+                  )),
+            ]),
+          ],
         ),
-        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-      );
-    }
+        color: greyColor2,
+        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+        // shape:
+        //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      ),
+      margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+    );
   }
 }
 
 class Choice {
-  const Choice({this.title, this.icon});
+  const Choice({@required this.title, @required this.icon});
 
   final String title;
   final IconData icon;

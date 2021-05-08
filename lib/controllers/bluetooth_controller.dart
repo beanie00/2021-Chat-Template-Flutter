@@ -1,7 +1,7 @@
 import 'package:flutter_blue/flutter_blue.dart';
 
-BluetoothDevice? gConnectedDevice;
-BluetoothCharacteristic? gConnectedCharacteristic;
+BluetoothDevice gConnectedDevice;
+BluetoothCharacteristic gConnectedCharacteristic;
 
 // class BluetoothController {
 //   static connectB612(ScanResult r) async {

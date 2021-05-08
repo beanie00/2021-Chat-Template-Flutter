@@ -8,8 +8,8 @@ class MusicThemeModel {
       AssetImage('assets/images/high_quality/bird.png'); // default cached image
 
   MusicThemeModel({
-    required this.imagePath,
-    required this.imageHighQualityPath,
-    required this.soundPath,
+    @required this.imagePath,
+    @required this.imageHighQualityPath,
+    @required this.soundPath,
   });
 }

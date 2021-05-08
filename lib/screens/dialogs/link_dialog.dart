@@ -48,7 +48,7 @@ class _LinkDialogState extends State<LinkDialog> {
           initialData: [],
           builder: (c, snapshot) {
             return Column(
-              children: snapshot.data!
+              children: snapshot.data
                   .map(
                     (r) => ScanResultTile(
                       result: r,
@@ -159,7 +159,7 @@ void _bluetoothReceiveCallback(value) {
         SoundController.changeMusic(newMusic);
 
         HttpController.sendMoistureToServer(
-            deviceId: gConnectedDevice!.name.substring(7, 13),
+            deviceId: gConnectedDevice.name.substring(7, 13),
             moisture: moisturePercent * 100);
       }
     } else if ((0 <= element) && (element < 20)) {

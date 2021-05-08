@@ -13,6 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'constants/app_colors.dart';
+
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
@@ -24,9 +26,10 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.purple,
         title: Text(
-          '채팅',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          '식물 채팅',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -53,20 +56,21 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
   ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar});
 
-  String peerId;
-  String peerAvatar;
-  String id;
+  String peerId = "";
+  String peerAvatar = "";
+  String id = "";
 
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
+  //List listMessage = new List.from([]);
   int _limit = 20;
   int _limitIncrement = 20;
-  String groupChatId;
+  String groupChatId = "";
   SharedPreferences prefs;
 
   File imageFile;
-  bool isLoading;
-  bool isShowSticker;
-  String imageUrl;
+  bool isLoading = false;
+  bool isShowSticker = false;
+  String imageUrl = "";
 
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
@@ -276,7 +280,7 @@ class ChatScreenState extends State<ChatScreen> {
                   // Sticker
                   : Container(
                       child: Image.asset(
-                        'images/${document.get('content')}.gif',
+                        'images/water_below.png',
                         width: 100.0,
                         height: 100.0,
                         fit: BoxFit.cover,
@@ -495,7 +499,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi1', 2),
                 child: Image.asset(
-                  'images/mimi1.gif',
+                  'images/water_below.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -504,7 +508,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi2', 2),
                 child: Image.asset(
-                  'images/mimi2.gif',
+                  'images/water_over.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -513,7 +517,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi3', 2),
                 child: Image.asset(
-                  'images/mimi3.gif',
+                  'images/sun_over.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -527,7 +531,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi4', 2),
                 child: Image.asset(
-                  'images/mimi4.gif',
+                  'images/sun_below.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -536,7 +540,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi5', 2),
                 child: Image.asset(
-                  'images/mimi5.gif',
+                  'images/love.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -545,7 +549,7 @@ class ChatScreenState extends State<ChatScreen> {
               FlatButton(
                 onPressed: () => onSendMessage('mimi6', 2),
                 child: Image.asset(
-                  'images/mimi6.gif',
+                  'images/humid_over.png',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -686,13 +690,13 @@ class ChatScreenState extends State<ChatScreen> {
                   .limit(_limit)
                   .snapshots(),
               builder: (context, snapshot) {
+                listMessage.addAll(snapshot.data.docs);
                 if (!snapshot.hasData) {
                   return Center(
                       child: CircularProgressIndicator(
                           valueColor:
                               AlwaysStoppedAnimation<Color>(themeColor)));
                 } else {
-                  listMessage.addAll(snapshot.data.docs);
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>

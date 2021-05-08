@@ -28,7 +28,7 @@ class FindDevicesScreen extends StatelessWidget {
                     .asyncMap((_) => FlutterBlue.instance.connectedDevices),
                 initialData: [],
                 builder: (c, snapshot) => Column(
-                  children: snapshot.data!
+                  children: snapshot.data
                       .map((d) => ListTile(
                             title: Text(d.name),
                             subtitle: Text(d.id.toString()),
@@ -57,7 +57,7 @@ class FindDevicesScreen extends StatelessWidget {
                 stream: FlutterBlue.instance.scanResults,
                 initialData: [],
                 builder: (c, snapshot) => Column(
-                  children: snapshot.data!
+                  children: snapshot.data
                       .map(
                         (r) => ScanResultTile(
                           result: r,
@@ -79,7 +79,7 @@ class FindDevicesScreen extends StatelessWidget {
         stream: FlutterBlue.instance.isScanning,
         initialData: false,
         builder: (c, snapshot) {
-          if (snapshot.data!) {
+          if (snapshot.data) {
             return FloatingActionButton(
               child: Icon(Icons.stop),
               onPressed: () => FlutterBlue.instance.stopScan(),
@@ -98,7 +98,7 @@ class FindDevicesScreen extends StatelessWidget {
 }
 
 class DeviceScreen extends StatefulWidget {
-  const DeviceScreen({Key? key, required this.device}) : super(key: key);
+  const DeviceScreen({Key key, @required this.device}) : super(key: key);
 
   final BluetoothDevice device;
 
@@ -107,6 +107,10 @@ class DeviceScreen extends StatefulWidget {
 }
 
 class _DeviceScreenState extends State<DeviceScreen> {
+  var gIndex;
+
+  var gValue;
+
   List<int> _getRandomBytes() {
     final math = Random();
     return [
@@ -132,7 +136,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       await c.read();
                     },
                     onNotificationPressed: () async {
-                      if (!c.isNotifying) gSerialMessages = '';
+                      if (!c.isNotifying) var gSerialMessages = '';
                       await c.setNotifyValue(!c.isNotifying);
                       await c.read();
                       c.value.listen((value) {
@@ -164,6 +168,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   Widget build(BuildContext context) {
     // device.discoverServices();
+    var gSerialMessages;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.device.name),
@@ -172,7 +177,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             stream: widget.device.state,
             initialData: BluetoothDeviceState.connecting,
             builder: (c, snapshot) {
-              VoidCallback? onPressed;
+              VoidCallback onPressed;
               String text;
               switch (snapshot.data) {
                 case BluetoothDeviceState.connected:
@@ -218,7 +223,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   stream: widget.device.isDiscoveringServices,
                   initialData: false,
                   builder: (c, snapshot) => IndexedStack(
-                    index: snapshot.data! ? 1 : 0,
+                    index: snapshot.data ? 1 : 0,
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.refresh),
@@ -258,7 +263,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
               initialData: [],
               builder: (c, snapshot) {
                 return Column(
-                  children: _buildServiceTiles(snapshot.data!),
+                  children: _buildServiceTiles(snapshot.data),
                 );
               },
             ),
@@ -293,11 +298,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
 }
 
 class ScanResultTile extends StatelessWidget {
-  const ScanResultTile({Key? key, required this.result, this.onTap})
+  const ScanResultTile({Key key, @required this.result, this.onTap})
       : super(key: key);
 
   final ScanResult result;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   Widget _buildTitle(BuildContext context) {
     print(result.device.name);
@@ -416,7 +421,7 @@ class ServiceTile extends StatelessWidget {
   final List<CharacteristicTile> characteristicTiles;
 
   const ServiceTile(
-      {Key? key, required this.service, required this.characteristicTiles})
+      {Key key, @required this.service, @required this.characteristicTiles})
       : super(key: key);
 
   @override
@@ -448,14 +453,14 @@ class ServiceTile extends StatelessWidget {
 class CharacteristicTile extends StatelessWidget {
   final BluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
-  final VoidCallback? onReadPressed;
-  final VoidCallback? onWritePressed;
-  final VoidCallback? onNotificationPressed;
+  final VoidCallback onReadPressed;
+  final VoidCallback onWritePressed;
+  final VoidCallback onNotificationPressed;
 
   const CharacteristicTile(
-      {Key? key,
-      required this.characteristic,
-      required this.descriptorTiles,
+      {Key key,
+      @required this.characteristic,
+      @required this.descriptorTiles,
       this.onReadPressed,
       this.onWritePressed,
       this.onNotificationPressed})
@@ -518,12 +523,12 @@ class CharacteristicTile extends StatelessWidget {
 
 class DescriptorTile extends StatelessWidget {
   final BluetoothDescriptor descriptor;
-  final VoidCallback? onReadPressed;
-  final VoidCallback? onWritePressed;
+  final VoidCallback onReadPressed;
+  final VoidCallback onWritePressed;
 
   const DescriptorTile(
-      {Key? key,
-      required this.descriptor,
+      {Key key,
+      @required this.descriptor,
       this.onReadPressed,
       this.onWritePressed})
       : super(key: key);
@@ -572,7 +577,7 @@ class DescriptorTile extends StatelessWidget {
 }
 
 class AdapterStateTile extends StatelessWidget {
-  const AdapterStateTile({Key? key, required this.state}) : super(key: key);
+  const AdapterStateTile({Key key, @required this.state}) : super(key: key);
 
   final BluetoothState state;
 

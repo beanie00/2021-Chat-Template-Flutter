@@ -10,12 +10,12 @@ import 'package:dearplant/screens/dialogs/link_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
+class PlantSound extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<PlantSound> {
   @override
   void initState() {
     gMusicThemeList.forEach((element) async {
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: TextButton(
                               onPressed: () {
                                 if (appData.isConnected) {
-                                  gConnectedDevice!.disconnect();
+                                  gConnectedDevice.disconnect();
                                   appData.isConnected = false;
                                   appData.isMuted = false;
                                   appData.isMusicPlaying = false;
