@@ -10,7 +10,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 
 import 'controllers/sound_controller.dart';
 
-class  extends StatelessWidget {
+class FindDevicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
