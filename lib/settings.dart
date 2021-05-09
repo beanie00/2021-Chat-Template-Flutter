@@ -40,7 +40,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   SharedPreferences prefs;
 
-  String id = '';
+  String id = '5yvcWeJEUhaj4LpGwUw9GldG9ec2';
   String nickname = '';
   String aboutMe = '';
   String photoUrl = '';
@@ -85,258 +85,280 @@ class SettingsScreenState extends State<SettingsScreen> {
         isLoading = true;
       });
     }
-    //uploadFile();
+    uploadFile();
   }
 
-  // Future uploadFile() async {
-  //   String fileName = id;
-  //   StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
-  //   StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
-  //   StorageTaskSnapshot storageTaskSnapshot;
-  //   uploadTask.onComplete.then((value) {
-  //     if (value.error == null) {
-  //       storageTaskSnapshot = value;
-  //       storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-  //         photoUrl = downloadUrl;
-  //         FirebaseFirestore.instance.collection('users').doc(id).update({
-  //           'nickname': nickname,
-  //           'aboutMe': aboutMe,
-  //           'photoUrl': photoUrl
-  //         }).then((data) async {
-  //           await prefs.setString('photoUrl', photoUrl);
-  //           setState(() {
-  //             isLoading = false;
-  //           });
-  //           Fluttertoast.showToast(msg: "Upload success");
-  //         }).catchError((err) {
-  //           setState(() {
-  //             isLoading = false;
-  //           });
-  //           Fluttertoast.showToast(msg: err.toString());
-  //         });
-  //       }, onError: (err) {
-  //         setState(() {
-  //           isLoading = false;
-  //         });
-  //         Fluttertoast.showToast(msg: 'This file is not an image');
-  //       });
-  //     } else {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       Fluttertoast.showToast(msg: 'This file is not an image');
-  //     }
-  //   }, onError: (err) {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     Fluttertoast.showToast(msg: err.toString());
-  //   });
-  // }
-
-  void handleUpdateData() {
-    focusNodeNickname.unfocus();
-    focusNodeAboutMe.unfocus();
-
-    setState(() {
-      isLoading = true;
-    });
-
-    FirebaseFirestore.instance.collection('users').doc(id).update({
-      'nickname': nickname,
-      'aboutMe': aboutMe,
-      'photoUrl': photoUrl
-    }).then((data) async {
-      await prefs.setString('nickname', nickname);
-      await prefs.setString('aboutMe', aboutMe);
-      await prefs.setString('photoUrl', photoUrl);
-
+  Future uploadFile() async {
+    String plantId = FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .collection('PlantInventory')
+        .snapshots()
+        .length
+        .toString();
+    String fileName = plantId;
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child(fileName);
+    UploadTask uploadTask = ref.putFile(avatarImageFile);
+    uploadTask.then((value) {
+      value.ref.getDownloadURL().then((downloadUrl) {
+        photoUrl = downloadUrl;
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(id)
+            .collection('PlantInventory')
+            .doc(plantId)
+            .update({
+          'plantNick': nickname,
+          'plantName': aboutMe,
+          'plantUrl': "",
+          'watering': ""
+        }).then((data) async {
+          await prefs.setString('photoUrl', photoUrl);
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(msg: "식물 프로필 사진이 등록되었습니다.");
+        }).catchError((err) {
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(msg: err.toString());
+        });
+      }, onError: (err) {
+        setState(() {
+          isLoading = false;
+        });
+        Fluttertoast.showToast(msg: '이미지 형식의 파일을 선택해주세요.');
+      });
+    }, onError: (err) {
       setState(() {
         isLoading = false;
       });
-
-      Fluttertoast.showToast(msg: "Update success");
-    }).catchError((err) {
-      setState(() {
-        isLoading = false;
-      });
-
       Fluttertoast.showToast(msg: err.toString());
     });
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              // Avatar
-              Container(
-                child: Center(
-                  child: Stack(
-                    children: <Widget>[
-                      (avatarImageFile == null)
-                          ? (photoUrl != ''
-                              ? Material(
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) => Container(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.0,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                themeColor),
+    void handleUpdateData() {
+      String plantId = FirebaseFirestore.instance
+          .collection('users')
+          .doc(id)
+          .collection('PlantInventory')
+          .snapshots()
+          .length
+          .toString();
+      focusNodeNickname.unfocus();
+      focusNodeAboutMe.unfocus();
+
+      setState(() {
+        isLoading = true;
+      });
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(id)
+          .collection('PlantInventory')
+          .doc(plantId)
+          .update({
+        'plantNick': nickname,
+        'plantName': aboutMe,
+        'plantUrl': "",
+        'watering': ""
+      }).then((data) async {
+        await prefs.setString('plantNick', nickname);
+        await prefs.setString('plantName', aboutMe);
+        await prefs.setString('plantUrl', "");
+        await prefs.setString('watering', "");
+
+        setState(() {
+          isLoading = false;
+        });
+
+        Fluttertoast.showToast(msg: "Update success");
+      }).catchError((err) {
+        setState(() {
+          isLoading = false;
+        });
+
+        Fluttertoast.showToast(msg: err.toString());
+      });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                // Avatar
+                Container(
+                  child: Center(
+                    child: Stack(
+                      children: <Widget>[
+                        (avatarImageFile == null)
+                            ? (photoUrl != ''
+                                ? Material(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) => Container(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  themeColor),
+                                        ),
+                                        width: 90.0,
+                                        height: 90.0,
+                                        padding: EdgeInsets.all(20.0),
                                       ),
+                                      imageUrl: photoUrl,
                                       width: 90.0,
                                       height: 90.0,
-                                      padding: EdgeInsets.all(20.0),
+                                      fit: BoxFit.cover,
                                     ),
-                                    imageUrl: photoUrl,
-                                    width: 90.0,
-                                    height: 90.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                )
-                              : Icon(
-                                  Icons.account_circle,
-                                  size: 90.0,
-                                  color: greyColor,
-                                ))
-                          : Material(
-                              child: Image.file(
-                                avatarImageFile,
-                                width: 90.0,
-                                height: 90.0,
-                                fit: BoxFit.cover,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 90.0,
+                                    color: greyColor,
+                                  ))
+                            : Material(
+                                child: Image.file(
+                                  avatarImageFile,
+                                  width: 90.0,
+                                  height: 90.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(45.0)),
+                                clipBehavior: Clip.hardEdge,
                               ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(45.0)),
-                              clipBehavior: Clip.hardEdge,
-                            ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          color: primaryColor.withOpacity(0.5),
+                        IconButton(
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: primaryColor.withOpacity(0.5),
+                          ),
+                          onPressed: getImage,
+                          padding: EdgeInsets.all(30.0),
+                          splashColor: Colors.transparent,
+                          highlightColor: greyColor,
+                          iconSize: 30.0,
                         ),
-                        onPressed: getImage,
-                        padding: EdgeInsets.all(30.0),
-                        splashColor: Colors.transparent,
-                        highlightColor: greyColor,
-                        iconSize: 30.0,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  width: double.infinity,
+                  margin: EdgeInsets.all(20.0),
                 ),
-                width: double.infinity,
-                margin: EdgeInsets.all(20.0),
-              ),
 
-              // Input
-              Column(
-                children: <Widget>[
-                  // Username
-                  Container(
-                    child: Text(
-                      'Nickname',
-                      style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor),
-                    ),
-                    margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
-                  ),
-                  Container(
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(primaryColor: primaryColor),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Sweetie',
-                          contentPadding: EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
-                        ),
-                        controller: controllerNickname,
-                        onChanged: (value) {
-                          nickname = value;
-                        },
-                        focusNode: focusNodeNickname,
+                // Input
+                Column(
+                  children: <Widget>[
+                    // Username
+                    Container(
+                      child: Text(
+                        '식물 별명',
+                        style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor),
                       ),
+                      margin:
+                          EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                     ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                  ),
-
-                  // About me
-                  Container(
-                    child: Text(
-                      'About me',
-                      style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor),
-                    ),
-                    margin: EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
-                  ),
-                  Container(
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(primaryColor: primaryColor),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Fun, like travel and play PES...',
-                          contentPadding: EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
+                    Container(
+                      child: Theme(
+                        data: Theme.of(context)
+                            .copyWith(primaryColor: primaryColor),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: '반려식물의 별명을 지어주세요.',
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintStyle: TextStyle(color: greyColor),
+                          ),
+                          controller: controllerNickname,
+                          onChanged: (value) {
+                            nickname = value;
+                          },
+                          focusNode: focusNodeNickname,
                         ),
-                        controller: controllerAboutMe,
-                        onChanged: (value) {
-                          aboutMe = value;
-                        },
-                        focusNode: focusNodeAboutMe,
                       ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
                     ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.start,
-              ),
 
-              // Button
-              Container(
-                child: FlatButton(
-                  onPressed: handleUpdateData,
-                  child: Text(
-                    '등록하기',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                  color: primaryColor,
-                  highlightColor: Color(0xff8d93a0),
-                  splashColor: Colors.transparent,
-                  textColor: Colors.white,
-                  padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                    // About me
+                    Container(
+                      child: Text(
+                        '식물 종 선택',
+                        style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor),
+                      ),
+                      margin:
+                          EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
+                    ),
+                    Container(
+                      child: Theme(
+                        data: Theme.of(context)
+                            .copyWith(primaryColor: primaryColor),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: '식물 종을 선택해주세요.',
+                            contentPadding: EdgeInsets.all(5.0),
+                            hintStyle: TextStyle(color: greyColor),
+                          ),
+                          controller: controllerAboutMe,
+                          onChanged: (value) {
+                            aboutMe = value;
+                          },
+                          focusNode: focusNodeAboutMe,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                    ),
+                  ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
                 ),
-                margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
-              ),
-            ],
+
+                // Button
+                Container(
+                  child: FlatButton(
+                    onPressed: handleUpdateData,
+                    child: Text(
+                      '등록하기',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    color: primaryColor,
+                    highlightColor: Color(0xff8d93a0),
+                    splashColor: Colors.transparent,
+                    textColor: Colors.white,
+                    padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                  ),
+                  margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.only(left: 15.0, right: 15.0),
           ),
-          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-        ),
 
-        // Loading
-        Positioned(
-          child: isLoading
-              ? Container(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-                  ),
-                  color: Colors.white.withOpacity(0.8),
-                )
-              : Container(),
-        ),
-      ],
-    );
+          // Loading
+          Positioned(
+            child: isLoading
+                ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
+                : Container(),
+          ),
+        ],
+      );
+    }
   }
 }

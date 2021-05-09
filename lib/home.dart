@@ -389,7 +389,7 @@ class HomeScreenState extends State<HomeScreen> {
                         ),
                         Container(
                           child: Text(
-                            '식물종: ${document.get('plantName') ?? 'Not available'}',
+                            '식물 종: ${document.get('plantName') ?? 'Not available'}',
                             style: TextStyle(color: primaryColor),
                           ),
                           alignment: Alignment.centerLeft,
