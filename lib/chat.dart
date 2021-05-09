@@ -27,10 +27,36 @@ class Chat extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.purple,
-        title: Text(
-          '식물 채팅',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Material(
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Container(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                    ),
+                    width: 30.0,
+                    height: 30.0,
+                    padding: EdgeInsets.all(15.0),
+                  ),
+                  imageUrl: peerAvatar,
+                  width: 30.0,
+                  height: 30.0,
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                clipBehavior: Clip.hardEdge,
+              ),
+              SizedBox(width: 7),
+              Text(
+                peerId,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              )
+            ]),
         centerTitle: true,
       ),
       body: ChatScreen(
@@ -612,32 +638,33 @@ class ChatScreenState extends State<ChatScreen> {
       child: Row(
         children: <Widget>[
           // Button send image
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.image),
-                onPressed: getImage,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.face),
-                onPressed: getSticker,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
+          // Material(
+          //   child: Container(
+          //     margin: EdgeInsets.symmetric(horizontal: 1.0),
+          //     child: IconButton(
+          //       icon: Icon(Icons.image),
+          //       onPressed: getImage,
+          //       color: primaryColor,
+          //     ),
+          //   ),
+          //   color: Colors.white,
+          // ),
+          // Material(
+          //   child: Container(
+          //     margin: EdgeInsets.symmetric(horizontal: 1.0),
+          //     child: IconButton(
+          //       icon: Icon(Icons.face),
+          //       onPressed: getSticker,
+          //       color: primaryColor,
+          //     ),
+          //   ),
+          //   color: Colors.white,
+          // ),
 
           // Edit text
           Flexible(
             child: Container(
+              margin: EdgeInsets.only(left: 15),
               child: TextField(
                 onSubmitted: (value) {
                   onSendMessage(textEditingController.text, 0);
@@ -645,7 +672,7 @@ class ChatScreenState extends State<ChatScreen> {
                 style: TextStyle(color: primaryColor, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
-                  hintText: 'Type your message...',
+                  hintText: '식물에게 하고 싶은 말을 입력해주세요.',
                   hintStyle: TextStyle(color: greyColor),
                 ),
                 focusNode: focusNode,

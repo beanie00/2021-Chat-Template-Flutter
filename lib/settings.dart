@@ -59,10 +59,10 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
-    nickname = prefs.getString('nickname') ?? '';
-    aboutMe = prefs.getString('aboutMe') ?? '';
-    photoUrl = prefs.getString('photoUrl') ?? '';
+    // id = prefs.getString('id') ?? '';
+    // nickname = prefs.getString('nickname') ?? '';
+    // aboutMe = prefs.getString('aboutMe') ?? '';
+    // photoUrl = prefs.getString('photoUrl') ?? '';
 
     controllerNickname = TextEditingController(text: nickname);
     controllerAboutMe = TextEditingController(text: aboutMe);
@@ -104,6 +104,9 @@ class SettingsScreenState extends State<SettingsScreen> {
       value.ref.getDownloadURL().then((downloadUrl) {
         photoUrl = downloadUrl;
         Fluttertoast.showToast(msg: "식물 프로필 사진이 등록되었습니다.");
+        setState(() {
+          isLoading = false;
+        });
         // FirebaseFirestore.instance
         //     .collection('users')
         //     .doc(id)
@@ -162,7 +165,8 @@ class SettingsScreenState extends State<SettingsScreen> {
       'plantNick': nickname,
       'plantName': aboutMe,
       'plantUrl': photoUrl,
-      'watering': ""
+      'watering': "",
+      'B612': "",
     }).then((data) async {
       await prefs.setString('plantNick', nickname);
       await prefs.setString('plantName', aboutMe);

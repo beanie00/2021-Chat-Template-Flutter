@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dearplant/screens/dialogs/link_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:dearplant/screens/home_screen.dart';
 import 'package:dearplant/widget/loading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'constants/app_colors.dart';
@@ -255,11 +257,13 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.purple,
+        automaticallyImplyLeading: false,
         title: Text(
           '나의 식물 친구',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        leading: null,
         actions: <Widget>[
           PopupMenuButton<Choice>(
             onSelected: onItemMenuPress,
@@ -340,38 +344,84 @@ class HomeScreenState extends State<HomeScreen> {
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withOpacity(0.9),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Container(
         child: Column(
           children: [
             Row(
               children: <Widget>[
-                Material(
-                  child: document.get('plantUrl') != null
-                      ? CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.0,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+                Column(
+                  children: [
+                    Material(
+                      child: document.get('plantUrl') != null
+                          ? CachedNetworkImage(
+                              placeholder: (context, url) => Container(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.0,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(themeColor),
+                                ),
+                                width: 80.0,
+                                height: 80.0,
+                                padding: EdgeInsets.all(15.0),
+                              ),
+                              imageUrl: document.get('plantUrl'),
+                              width: 80.0,
+                              height: 80.0,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(
+                              Icons.account_circle,
+                              size: 80.0,
+                              color: greyColor,
                             ),
-                            width: 80.0,
-                            height: 80.0,
-                            padding: EdgeInsets.all(15.0),
+                      borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                      clipBehavior: Clip.hardEdge,
+                    ),
+                    document.get('B612') == ""
+                        ? GestureDetector(
+                            onTap: () {
+                              Get.dialog(
+                                LinkDialog(),
+                                barrierDismissible: false,
+                              );
+                            },
+                            child: new Container(
+                              margin: EdgeInsets.only(top: 2),
+                              padding: EdgeInsets.only(
+                                  top: 3, bottom: 3, left: 5, right: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.black45,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25.0)),
+                              ),
+                              child: Text(
+                                'B612 연결',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ))
+                        : Container(
+                            margin: EdgeInsets.only(top: 2),
+                            padding: EdgeInsets.only(
+                                top: 3, bottom: 3, left: 5, right: 5),
+                            decoration: BoxDecoration(
+                              color: AppColors.green,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25.0)),
+                            ),
+                            child: Text(
+                              document.get('B612'),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                          imageUrl: document.get('plantUrl'),
-                          width: 80.0,
-                          height: 80.0,
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.account_circle,
-                          size: 80.0,
-                          color: greyColor,
-                        ),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  clipBehavior: Clip.hardEdge,
+                  ],
                 ),
                 Flexible(
                   child: Container(
@@ -379,7 +429,7 @@ class HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Container(
                           child: Text(
-                            '별명: ${document.get('plantNick')}',
+                            '식물 별명: ${document.get('plantNick')}',
                             style: TextStyle(color: primaryColor),
                           ),
                           alignment: Alignment.centerLeft,
@@ -409,52 +459,57 @@ class HomeScreenState extends State<HomeScreen> {
               ],
             ),
             SizedBox(height: 20),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <
-                Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Chat(
-                                peerId: document.get('plantNick'),
-                                peerAvatar: document.get('plantUrl'),
-                              )));
-                },
-                child: Text(
-                  '식물 채팅',
-                  style: TextStyle(color: AppColors.purple),
-                  textAlign: TextAlign.center,
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      EdgeInsets.only(top: 10, bottom: 10, left: 40, right: 40),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40.0),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Chat(
+                                    peerId: document.get('plantNick'),
+                                    peerAvatar: document.get('plantUrl'),
+                                  )));
+                    },
+                    child: Text(
+                      '식물 채팅',
+                      style: TextStyle(color: AppColors.purple),
+                      textAlign: TextAlign.center,
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.only(
+                          top: 10, bottom: 10, left: 40, right: 40),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40.0),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => PlantSound()));
-                },
-                child: Text(
-                  '식물 소리',
-                  style: TextStyle(color: AppColors.purple),
-                  textAlign: TextAlign.center,
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding:
-                      EdgeInsets.only(top: 10, bottom: 10, left: 40, right: 40),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40.0),
+                  TextButton(
+                    onPressed: () {
+                      document.get('B612') == ""
+                          ? Fluttertoast.showToast(msg: "B612를 먼저 연결해주세요.")
+                          : Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PlantSound()));
+                    },
+                    child: Text(
+                      '식물 소리',
+                      style: TextStyle(color: AppColors.purple),
+                      textAlign: TextAlign.center,
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.only(
+                          top: 10, bottom: 10, left: 40, right: 40),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40.0),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ])
+                ])
           ],
         ),
         padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
