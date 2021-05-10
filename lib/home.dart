@@ -13,13 +13,23 @@ import 'package:dearplant/const.dart';
 import 'package:dearplant/settings.dart';
 import 'package:dearplant/screens/home_screen.dart';
 import 'package:dearplant/widget/loading.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'constants/app_colors.dart';
+import 'constants/music_theme.dart';
+import 'controllers/app_data.dart';
+import 'controllers/http_controller.dart';
+import 'controllers/sound_controller.dart';
 import 'main.dart';
+import 'models/music_theme_model.dart';
+
+var selectedPlantNick = '';
+BluetoothDevice gConnectedDevice;
+BluetoothCharacteristic gConnectedCharacteristic;
 
 class HomeScreen extends StatefulWidget {
   final String currentUserId;
@@ -54,6 +64,132 @@ class HomeScreenState extends State<HomeScreen> {
     //registerNotification();
     //configLocalNotification();
     listScrollController.addListener(scrollListener);
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .collection('PlantInventory')
+        .get()
+        .then((QuerySnapshot ds) {
+      ds.docs.forEach((doc) => linkB612(doc));
+    });
+  }
+
+  void linkB612(DocumentSnapshot document) {
+    if (document['B612'] != "") {
+      FlutterBlue flutterBlue = FlutterBlue.instance;
+      flutterBlue.startScan(timeout: Duration(seconds: 4));
+      // Listen to scan results
+      flutterBlue.scanResults.listen((results) {
+        // do something with scan results
+        for (ScanResult r in results) {
+          if (r.device.name == document['B612']) {
+            gConnectedDevice = r.device;
+            r.device.connect();
+            r.device.discoverServices();
+            r.device.services.listen((List<BluetoothService> event) {
+              if (Get.find<AppData>().isConnected) {
+                return;
+              }
+              event.forEach((BluetoothService element) async {
+                print(
+                    '${element.uuid.toString().toUpperCase().substring(4, 8)}');
+                if ((element.uuid.toString().toUpperCase().substring(4, 8)) ==
+                    'FFE0') {
+                  Get.find<AppData>().isConnected = true;
+                  BluetoothCharacteristic c = element.characteristics.first;
+                  await c.setNotifyValue(true);
+                  await c.read();
+                  gConnectedCharacteristic = c;
+                  Timer.periodic(Duration(milliseconds: 50), _timerCallback);
+                  moistureString = '';
+                  moistureInt = 0;
+                  countOfLinefeed = 0;
+                  c.value.listen(_bluetoothReceiveCallback);
+                }
+              });
+            });
+          }
+        }
+      });
+    }
+  }
+
+  void _bluetoothReceiveCallback(value) {
+    AppData appData = Get.find<AppData>();
+    value.forEach((element) {
+      if (appData.isMuted) {
+        return;
+      }
+
+      if ((48 < element) && (element < 57)) {
+        // ascii 0~9, moisture data
+        moistureString += String.fromCharCode(element);
+        if (moistureString.length == 3) {
+          MusicThemeModel newMusic;
+          moistureInt = int.parse(moistureString);
+          print('moisture: $moistureInt');
+
+          // 1. 수분값 매핑
+          double moisturePercent = 1 - ((moistureInt - 100) / 400);
+
+          // 2. 0~25: 모닥불, 25~50: 귀뚜라미, 50~75: 새소리, 75~100: 강물
+          if (moisturePercent < 0.25) {
+            newMusic = MusicThemes.fire;
+          } else if (moisturePercent < 0.5) {
+            newMusic = MusicThemes.cricket;
+          } else if (moisturePercent < 0.75) {
+            newMusic = MusicThemes.bird;
+          } else {
+            newMusic = MusicThemes.river;
+          }
+          Get.find<AppData>().selectedMusic = newMusic;
+          SoundController.changeMusic(newMusic);
+
+          HttpController.sendMoistureToServer(
+              deviceId: gConnectedDevice.name.substring(7, 13),
+              moisture: moisturePercent * 100);
+        }
+      } else if ((0 <= element) && (element < 20)) {
+        // int 0~20, touch data
+
+        if (countOfLinefeed < 2) {
+          // exception: linefeed & carrige return value
+          countOfLinefeed++;
+          return;
+        }
+
+        value = element.toDouble();
+
+        double touchValue =
+            (value / 20).clamp(0, 1); // 0 ~ 20 -> Normalization 0 ~ 1
+        gDelayedVolume = touchValue;
+        if (touchValue > 0.1) {
+          if (appData.isMusicPlaying == false) {
+            appData.isMusicPlaying = true;
+            SoundController.play();
+          }
+        }
+        print('$touchValue, ${appData.isMusicPlaying}');
+      } else {
+        // error data
+      }
+
+      // double value = element.toDouble();
+      // element.toString()
+      // if (value > 20) {
+      // print('${element.toString()}}');
+      // return;
+      // }
+    });
+    return;
+  }
+
+  void _timerCallback(timer) async {
+    if (gConnectedDevice == null) {
+    } else {
+      SoundController.setVolume(gDelayedVolume);
+      // }
+    }
   }
 
   // void registerNotification() {
@@ -321,7 +457,7 @@ class HomeScreenState extends State<HomeScreen> {
                     return ListView.builder(
                       padding: EdgeInsets.all(10.0),
                       itemBuilder: (context, index) =>
-                          buildItem(context, snapshot.data.docs[index]),
+                          buildItem(context, snapshot.data.docs[index], index),
                       itemCount: snapshot.data.docs.length,
                       controller: listScrollController,
                     );
@@ -341,7 +477,7 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildItem(BuildContext context, DocumentSnapshot document) {
+  Widget buildItem(BuildContext context, DocumentSnapshot document, int index) {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.9),
@@ -380,30 +516,18 @@ class HomeScreenState extends State<HomeScreen> {
                       clipBehavior: Clip.hardEdge,
                     ),
                     document.get('B612') == ""
-                        ? GestureDetector(
-                            onTap: () {
-                              Get.dialog(
-                                LinkDialog(),
-                                barrierDismissible: false,
-                              );
-                            },
-                            child: new Container(
-                              margin: EdgeInsets.only(top: 2),
-                              padding: EdgeInsets.only(
-                                  top: 3, bottom: 3, left: 5, right: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(25.0)),
+                        ? Container(
+                            margin: EdgeInsets.only(top: 2),
+                            padding: EdgeInsets.only(
+                                top: 3, bottom: 3, left: 5, right: 5),
+                            child: Text(
+                              '',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
                               ),
-                              child: Text(
-                                'B612 연결',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ))
+                            ),
+                          )
                         : Container(
                             margin: EdgeInsets.only(top: 2),
                             padding: EdgeInsets.only(
@@ -443,14 +567,24 @@ class HomeScreenState extends State<HomeScreen> {
                           alignment: Alignment.centerLeft,
                           margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                         ),
-                        Container(
-                          child: Text(
-                            '수분량: ${document.get('watering')}',
-                            style: TextStyle(color: primaryColor),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                        )
+                        document.get('B612') != ""
+                            ? Container(
+                                child: Text(
+                                  '수분량: ${document.get('watering')}',
+                                  style: TextStyle(color: primaryColor),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                margin:
+                                    EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                              )
+                            : Container(
+                                child: Text(
+                                  '',
+                                ),
+                                alignment: Alignment.centerLeft,
+                                margin:
+                                    EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                              )
                       ],
                     ),
                     margin: EdgeInsets.only(left: 20.0),
@@ -458,22 +592,20 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  TextButton(
+            document.get('B612') == ""
+                ? SizedBox(height: 5)
+                : SizedBox(height: 20),
+            document.get('B612') == ""
+                ? TextButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Chat(
-                                    peerId: document.get('plantNick'),
-                                    peerAvatar: document.get('plantUrl'),
-                                  )));
+                      selectedPlantNick = document.get('plantNick');
+                      Get.dialog(
+                        LinkDialog(),
+                        barrierDismissible: false,
+                      );
                     },
                     child: Text(
-                      '식물 채팅',
+                      'B612 연결',
                       style: TextStyle(color: AppColors.purple),
                       textAlign: TextAlign.center,
                     ),
@@ -485,31 +617,59 @@ class HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(40.0),
                       ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      document.get('B612') == ""
-                          ? Fluttertoast.showToast(msg: "B612를 먼저 연결해주세요.")
-                          : Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PlantSound()));
-                    },
-                    child: Text(
-                      '식물 소리',
-                      style: TextStyle(color: AppColors.purple),
-                      textAlign: TextAlign.center,
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.only(
-                          top: 10, bottom: 10, left: 40, right: 40),
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40.0),
-                      ),
-                    ),
-                  ),
-                ])
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Chat(
+                                          peerId: document.get('plantNick'),
+                                          peerAvatar: document.get('plantUrl'),
+                                        )));
+                          },
+                          child: Text(
+                            '식물 채팅',
+                            style: TextStyle(color: AppColors.purple),
+                            textAlign: TextAlign.center,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.only(
+                                top: 10, bottom: 10, left: 40, right: 40),
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40.0),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            document.get('B612') == ""
+                                ? Fluttertoast.showToast(
+                                    msg: "B612를 먼저 연결해주세요.")
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => PlantSound()));
+                          },
+                          child: Text(
+                            '식물 소리 설정',
+                            style: TextStyle(color: AppColors.purple),
+                            textAlign: TextAlign.center,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.only(
+                                top: 10, bottom: 10, left: 40, right: 40),
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(40.0),
+                            ),
+                          ),
+                        ),
+                      ])
           ],
         ),
         padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),

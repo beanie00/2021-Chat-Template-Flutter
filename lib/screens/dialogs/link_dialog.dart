@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dearplant/ble_example_widgets.dart';
 import 'package:dearplant/constants/app_colors.dart';
 import 'package:dearplant/constants/music_theme.dart';
@@ -12,11 +13,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
 
+import '../../const.dart';
+import '../../home.dart';
+
 String moistureString = '';
 int moistureInt = 0;
 int countOfLinefeed = 0;
+String deviceName = '';
+
+BluetoothDevice gConnectedDevice;
+BluetoothCharacteristic gConnectedCharacteristic;
 
 class LinkDialog extends StatefulWidget {
+  LinkDialog();
+
   @override
   _LinkDialogState createState() => _LinkDialogState();
 }
@@ -71,6 +81,7 @@ class _LinkDialogState extends State<LinkDialog> {
                             ),
                             barrierDismissible: true,
                           );
+                          deviceName = r.device.name;
                           gConnectedDevice = r.device;
                           gConnectedDevice?.state
                               .listen((BluetoothDeviceState event) {
@@ -84,6 +95,14 @@ class _LinkDialogState extends State<LinkDialog> {
 
                           await r.device.connect();
                           await r.device.discoverServices();
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+                              .collection('PlantInventory')
+                              .get()
+                              .then((QuerySnapshot ds) {
+                            ds.docs.forEach((doc) => setB612(doc));
+                          });
                           r.device.services
                               .listen((List<BluetoothService> event) {
                             if (Get.find<AppData>().isConnected) {
@@ -124,6 +143,30 @@ class _LinkDialogState extends State<LinkDialog> {
       ],
       contentPadding: EdgeInsets.symmetric(vertical: 50),
     );
+  }
+}
+
+void setB612(DocumentSnapshot document) {
+  print('setB612' + document['plantNick']);
+  print('selectedPlantNick' + selectedPlantNick);
+  if (document['plantNick'] == selectedPlantNick) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .collection('PlantInventory')
+        .doc(document['plantNick'])
+        .update({
+      'B612': deviceName,
+    });
+  } else {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .collection('PlantInventory')
+        .doc(document['plantNick'])
+        .update({
+      'B612': "",
+    });
   }
 }
 

@@ -159,9 +159,10 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     FirebaseFirestore.instance
         .collection('users')
-        .doc(id)
+        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
         .collection('PlantInventory')
-        .add({
+        .doc(nickname)
+        .set({
       'plantNick': nickname,
       'plantName': aboutMe,
       'plantUrl': photoUrl,

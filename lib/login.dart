@@ -77,7 +77,7 @@ class LoginScreenState extends State<LoginScreen> {
     // );
 
     User firebaseUser = (await firebaseAuth.createUserWithEmailAndPassword(
-            email: "12345@gmail.com", password: "Apple123!"))
+            email: "12347@gmail.com", password: "Apple123!"))
         .user;
     if (firebaseUser != null) {
       // Check is already sign up

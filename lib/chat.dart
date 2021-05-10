@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:dearplant/controllers/http_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:dearplant/const.dart';
 import 'package:dearplant/widget/full_photo.dart';
@@ -197,27 +198,91 @@ class ChatScreenState extends State<ChatScreen> {
 
   void onSendMessage(String content, int type) {
     // type: 0 = text, 1 = image, 2 = sticker
+
     if (content.trim() != '') {
       textEditingController.clear();
 
-      var documentReference = FirebaseFirestore.instance
+      FirebaseFirestore.instance
           .collection('messages')
           .doc(groupChatId)
           .collection(groupChatId)
-          .doc(DateTime.now().millisecondsSinceEpoch.toString());
-
-      FirebaseFirestore.instance.runTransaction((transaction) async {
-        transaction.set(
-          documentReference,
-          {
-            'idFrom': id,
-            'idTo': peerId,
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'content': content,
-            'type': type
-          },
-        );
+          .add({
+        'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+        'idFrom': id,
+        'idTo': peerId,
+        'content': content,
+        'type': type
       });
+
+      HttpController.sendChat(
+          moisture: '70',
+          message: content,
+          user_id: '1111',
+          groupChatId: groupChatId,
+          id: id,
+          peerId: peerId,
+          type: type);
+
+      // var documentReference = FirebaseFirestore.instance
+      //     .collection('messages')
+      //     .doc(groupChatId)
+      //     .collection(groupChatId)
+      //     .doc(DateTime.now().millisecondsSinceEpoch.toString());
+
+      // FirebaseFirestore.instance.runTransaction((transaction) async {
+      //   transaction.set(
+      //     documentReference,
+      //     {},
+      //   );
+      // });
+
+      // Timer _timer;
+      // int _start = 1;
+      // const oneSec = const Duration(seconds: 1);
+      // _timer = new Timer.periodic(
+      //   oneSec,
+      //   (Timer timer) {
+      //     if (_start == 0) {
+      //       setState(() {
+      //         Future<String> chatContent = HttpController.sendChat(
+      //             moisture: '70', message: content, user_id: '1111');
+
+      //         documentReference = FirebaseFirestore.instance
+      //             .collection('messages')
+      //             .doc(groupChatId)
+      //             .collection(groupChatId)
+      //             .doc(DateTime.now().millisecondsSinceEpoch.toString());
+
+      //         chatContent.then((val) {
+      //           debugPrint('chat:' + val);
+      //           FirebaseFirestore.instance.runTransaction((transaction) async {
+      //             transaction.set(
+      //               documentReference,
+      //               {
+      //                 'timestamp':
+      //                     DateTime.now().millisecondsSinceEpoch.toString(),
+      //                 'idFrom': peerId,
+      //                 'idTo': id,
+      //                 'content': val,
+      //                 'type': type
+      //               },
+      //             );
+      //           });
+      //           print('val: $val');
+      //         }).catchError((error) {
+      //           // error가 해당 에러를 출력
+      //           print('error: $error');
+      //         });
+      //         timer.cancel();
+      //       });
+      //     } else {
+      //       setState(() {
+      //         _start--;
+      //       });
+      //     }
+      //   },
+      // );
+
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
@@ -325,30 +390,27 @@ class ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                isLastMessageLeft(index)
-                    ? Material(
-                        child: CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.0,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
-                            ),
-                            width: 35.0,
-                            height: 35.0,
-                            padding: EdgeInsets.all(10.0),
-                          ),
-                          imageUrl: peerAvatar,
-                          width: 35.0,
-                          height: 35.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(18.0),
-                        ),
-                        clipBehavior: Clip.hardEdge,
-                      )
-                    : Container(width: 35.0),
+                Material(
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                      ),
+                      width: 35.0,
+                      height: 35.0,
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                    imageUrl: peerAvatar,
+                    width: 35.0,
+                    height: 35.0,
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(18.0),
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                ),
                 document.get('type') == 0
                     ? Container(
                         child: Text(

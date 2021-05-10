@@ -8,7 +8,11 @@ import 'package:dearplant/controllers/bluetooth_controller.dart';
 import 'package:dearplant/controllers/sound_controller.dart';
 import 'package:dearplant/screens/dialogs/link_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
+
+BluetoothDevice gConnectedDevice;
+BluetoothCharacteristic gConnectedCharacteristic;
 
 class PlantSound extends StatefulWidget {
   @override
