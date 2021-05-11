@@ -5,13 +5,14 @@ import 'package:dearplant/ble_example_widgets.dart';
 import 'package:dearplant/constants/app_colors.dart';
 import 'package:dearplant/constants/music_theme.dart';
 import 'package:dearplant/controllers/app_data.dart';
-import 'package:dearplant/controllers/bluetooth_controller.dart';
 import 'package:dearplant/controllers/http_controller.dart';
 import 'package:dearplant/controllers/sound_controller.dart';
 import 'package:dearplant/models/music_theme_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:dearplant/home.dart';
 
 import '../../const.dart';
 import '../../home.dart';
@@ -22,8 +23,8 @@ int moistureInt = 0;
 int countOfLinefeed = 0;
 String deviceName = '';
 
-BluetoothDevice gConnectedDevice;
-BluetoothCharacteristic gConnectedCharacteristic;
+//BluetoothDevice gConnectedDevice;
+//BluetoothCharacteristic gConnectedCharacteristic;
 
 class LinkDialog extends StatefulWidget {
   LinkDialog();
@@ -106,9 +107,9 @@ class _LinkDialogState extends State<LinkDialog> {
                           });
                           r.device.services
                               .listen((List<BluetoothService> event) {
-                            if (Get.find<AppData>().isConnected) {
-                              return;
-                            }
+                            // if (Get.find<AppData>().isConnected) {
+                            //   return;
+                            // }
                             event.forEach((BluetoothService element) async {
                               print(
                                   '${element.uuid.toString().toUpperCase().substring(4, 8)}');
@@ -174,10 +175,6 @@ void setB612(DocumentSnapshot document) {
 void _bluetoothReceiveCallback(value) {
   AppData appData = Get.find<AppData>();
   value.forEach((element) {
-    if (appData.isMuted) {
-      return;
-    }
-
     if ((48 < element) && (element < 57)) {
       // ascii 0~9, moisture data
       moistureString += String.fromCharCode(element);
@@ -197,6 +194,15 @@ void _bluetoothReceiveCallback(value) {
           'watering': (moisturePercent * 100).toStringAsFixed(1) + "%",
         });
 
+        HttpController.sendMoistureToServer(
+            moisture: (moisturePercent * 100).toString(),
+            email: prefs.getString('nickname'),
+            nick: wateringPlant);
+
+        if (appData.isMuted) {
+          return;
+        }
+
         // 2. 0~25: 모닥불, 25~50: 귀뚜라미, 50~75: 새소리, 75~100: 강물
         if (moisturePercent < 0.25) {
           newMusic = MusicThemes.fire;
@@ -209,10 +215,6 @@ void _bluetoothReceiveCallback(value) {
         }
         Get.find<AppData>().selectedMusic = newMusic;
         SoundController.changeMusic(newMusic);
-
-        HttpController.sendMoistureToServer(
-            deviceId: gConnectedDevice.name.substring(7, 13),
-            moisture: moisturePercent * 100);
       }
     } else if ((0 <= element) && (element < 20)) {
       // int 0~20, touch data

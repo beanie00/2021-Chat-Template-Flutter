@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
@@ -13,6 +14,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dearplant/chat.dart';
+
+import 'constants/app_colors.dart';
+import 'controllers/http_controller.dart';
 
 String fireUserUid = '';
 
@@ -50,6 +54,7 @@ class LoginScreenState extends State<LoginScreen> {
     //isLoggedIn = await googleSignIn.isSignedIn();
     if (user != null) {
       fireUserUid = prefs.getString('id');
+      //print("fireUserUid" + fireUserUid);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -78,12 +83,17 @@ class LoginScreenState extends State<LoginScreen> {
       this.setState(() {
         isLoading = false;
       });
+      currentUser = firebaseUser;
+      fireUserUid = firebaseUser.uid;
+      await prefs.setString('id', fireUserUid);
+      await prefs.setString('nickname', data.name);
+
+      HttpController.signIn(email: data.name);
 
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  HomeScreen(currentUserId: firebaseUser.uid)));
+              builder: (context) => HomeScreen(currentUserId: fireUserUid)));
 
       return Future.delayed(Duration(milliseconds: 10)).then((_) {
         return null;
@@ -131,6 +141,13 @@ class LoginScreenState extends State<LoginScreen> {
           'chattingWith': null
         });
 
+        FirebaseMessaging.instance.getToken().then((token) {
+          print('token: $token');
+          HttpController.signUp(email: data.name, fcmId: token);
+        }).catchError((err) {
+          Fluttertoast.showToast(msg: err.message.toString());
+        });
+
         // Write data to local
         currentUser = firebaseUser;
         await prefs.setString('id', firebaseUser.uid);
@@ -163,7 +180,7 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
-      logo: 'assets/images/dearplant_white.webp',
+      logo: 'assets/images/dearplant_white.png',
       onLogin: (loginData) {
         return handleSignIn(loginData);
       },
@@ -181,7 +198,7 @@ class LoginScreenState extends State<LoginScreen> {
       },
       onRecoverPassword: (_) => Future(null),
       theme: LoginTheme(
-        primaryColor: Colors.purple,
+        primaryColor: AppColors.purple,
         errorColor: Colors.deepOrange,
       ),
       messages: LoginMessages(

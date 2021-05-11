@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dearplant/const.dart';
 import 'package:dearplant/login.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,18 +66,15 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
 
     // Force refresh input
     setState(() {});
   }
 
   Future getImage() async {
-    print("AAAAA");
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
 
-    print("BBBBB");
     pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
 
     File image = File(pickedFile.path);
@@ -87,12 +85,10 @@ class SettingsScreenState extends State<SettingsScreen> {
         isLoading = true;
       });
     }
-    print("CCCCC");
     uploadFile();
   }
 
   Future uploadFile() async {
-    print("DDDDD");
     print("firebase_id : " + id);
     String plantId = FirebaseFirestore.instance
         .collection('users')
@@ -127,6 +123,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void handleUpdateData() {
+    showNotification();
     // String plantId = FirebaseFirestore.instance
     //     .collection('users')
     //     .doc(id)
@@ -142,6 +139,9 @@ class SettingsScreenState extends State<SettingsScreen> {
     });
 
     aboutMe = editingController.text;
+
+    HttpController.registerPlant(
+        nick: nickname, typename: aboutMe, email: prefs.getString('nickname'));
 
     FirebaseFirestore.instance
         .collection('users')
@@ -165,6 +165,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       });
 
       Fluttertoast.showToast(msg: "새로운 식물 친구가 등록되었어요!");
+      Navigator.pop(context);
     }).catchError((err) {
       setState(() {
         isLoading = false;
@@ -409,4 +410,14 @@ class SettingsScreenState extends State<SettingsScreen> {
       ],
     );
   }
+}
+
+Future<void> showNotification() async {
+  var android = AndroidNotificationDetails(
+      'channelId', 'channelName', 'channelDescription',
+      importance: Importance.max, priority: Priority.max);
+  var iOS = IOSNotificationDetails();
+  var platform = NotificationDetails(android: android, iOS: iOS);
+
+  await FlutterLocalNotificationsPlugin().show(0, 'title', 'body', platform);
 }

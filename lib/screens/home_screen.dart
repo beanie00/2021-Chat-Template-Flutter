@@ -4,15 +4,14 @@ import 'dart:ui';
 import 'package:dearplant/constants/app_colors.dart';
 import 'package:dearplant/constants/music_theme.dart';
 import 'package:dearplant/controllers/app_data.dart';
-import 'package:dearplant/controllers/bluetooth_controller.dart';
 import 'package:dearplant/controllers/sound_controller.dart';
 import 'package:dearplant/screens/dialogs/link_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
+import 'package:dearplant/home.dart';
 
-BluetoothDevice gConnectedDevice;
-BluetoothCharacteristic gConnectedCharacteristic;
+//BluetoothDevice gConnectedDevice;
+//BluetoothCharacteristic gConnectedCharacteristic;
 
 class PlantSound extends StatefulWidget {
   @override
@@ -55,89 +54,76 @@ class _HomeScreenState extends State<PlantSound> {
                 toolbarHeight: 51,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                title: Stack(
-                  children: [
-                    Center(),
-                    Align(
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        height: 51,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Image.asset(
-                            'assets/images/dearplant_white.webp',
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
-                      ),
-                    ),
-                    appData.isConnected
-                        ? Align(
-                            alignment: Alignment.topRight,
-                            child: TextButton(
-                              onPressed: () {
-                                if (appData.isConnected) {
-                                  gConnectedDevice.disconnect();
-                                  appData.isConnected = false;
-                                  appData.isMuted = false;
-                                  appData.isMusicPlaying = false;
-                                  SoundController.stop();
-                                } else {
-                                  Get.dialog(
-                                    LinkDialog(),
-                                    barrierDismissible: false,
-                                  );
-                                }
-                              },
-                              child: Text(
-                                'B612 연결 끊기',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 10),
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    // Align(
-                    //   alignment: Alignment.bottomRight,
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.end,
-                    //     children: [
-                    //       Icon(
-                    //         Icons.bluetooth_disabled,
-                    //         size: 20.0,
-                    //         color: Colors.white,
-                    //       ),
-                    //       Switch(
-                    //         activeColor: Colors.white,
-                    //         value: appData.isConnected,
-                    //         onChanged: (value) {
-                    //           if (appData.isConnected) {
-                    //             gConnectedDevice!.disconnect();
-                    //             appData.isConnected = false;
-                    //             appData.isMuted = false;
-                    //             appData.isMusicPlaying = false;
-                    //             SoundController.stop();
-                    //           } else {
-                    //             Get.dialog(
-                    //               LinkDialog(),
-                    //               barrierDismissible: false,
-                    //             );
-                    //           }
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // Align(
-                    //   alignment: Alignment.bottomRight,
-                    //   child: Text(
-                    //     'B612 연결 끊기',
-                    //     style: TextStyle(color: Colors.white, fontSize: 10),
-                    //     textAlign: TextAlign.end,
-                    //   ),
-                    // ),
-                  ],
+                title: Text(
+                  '식물 소리',
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
                 ),
+                // appData.isConnected
+                //     ? Align(
+                //         alignment: Alignment.topRight,
+                //         child: TextButton(
+                //           onPressed: () {
+                //             if (appData.isConnected) {
+                //               gConnectedDevice.disconnect();
+                //               appData.isConnected = false;
+                //               appData.isMuted = false;
+                //               appData.isMusicPlaying = false;
+                //               SoundController.stop();
+                //             } else {
+                //               Get.dialog(
+                //                 LinkDialog(),
+                //                 barrierDismissible: false,
+                //               );
+                //             }
+                //           },
+                //           child: Text(
+                //             'B612 연결 끊기',
+                //             style: TextStyle(
+                //                 color: Colors.white, fontSize: 10),
+                //           ),
+                //         ),
+                //       )
+                //     : Container(),
+                // Align(
+                //   alignment: Alignment.bottomRight,
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: [
+                //       Icon(
+                //         Icons.bluetooth_disabled,
+                //         size: 20.0,
+                //         color: Colors.white,
+                //       ),
+                //       Switch(
+                //         activeColor: Colors.white,
+                //         value: appData.isConnected,
+                //         onChanged: (value) {
+                //           if (appData.isConnected) {
+                //             gConnectedDevice!.disconnect();
+                //             appData.isConnected = false;
+                //             appData.isMuted = false;
+                //             appData.isMusicPlaying = false;
+                //             SoundController.stop();
+                //           } else {
+                //             Get.dialog(
+                //               LinkDialog(),
+                //               barrierDismissible: false,
+                //             );
+                //           }
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // Align(
+                //   alignment: Alignment.bottomRight,
+                //   child: Text(
+                //     'B612 연결 끊기',
+                //     style: TextStyle(color: Colors.white, fontSize: 10),
+                //     textAlign: TextAlign.end,
+                //   ),
+                // ),
               ),
               body: Container(
                 decoration: BoxDecoration(
@@ -181,18 +167,16 @@ class _HomeScreenState extends State<PlantSound> {
                     SizedBox(
                       height: 22,
                     ),
-                    (!appData.isConnected)
-                        ? _connectButton()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _muteToggleButton(),
-                              SizedBox(
-                                width: 14,
-                              ),
-                              _calibrateButton(),
-                            ],
-                          ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _muteToggleButton(),
+                        SizedBox(
+                          width: 14,
+                        ),
+                        _calibrateButton(),
+                      ],
+                    ),
                     SizedBox(
                       height: 70,
                     ),
@@ -241,15 +225,15 @@ class _HomeScreenState extends State<PlantSound> {
                       child: Container(),
                       flex: 2,
                     ),
-                    Text(
-                      'Copyright 2021 Dearplants Inc. All rights reserved.',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w200,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    // Text(
+                    //   'Copyright 2021 Dearplants Inc. All rights reserved.',
+                    //   style: TextStyle(
+                    //     color: Colors.white,
+                    //     fontSize: 11,
+                    //     fontWeight: FontWeight.w200,
+                    //   ),
+                    //   textAlign: TextAlign.center,
+                    // ),
                   ],
                 ),
               ),
