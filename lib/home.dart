@@ -28,6 +28,7 @@ import 'main.dart';
 import 'models/music_theme_model.dart';
 
 var selectedPlantNick = '';
+var wateringPlant = '';
 BluetoothDevice gConnectedDevice;
 BluetoothCharacteristic gConnectedCharacteristic;
 
@@ -76,6 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   void linkB612(DocumentSnapshot document) {
     if (document['B612'] != "") {
+      wateringPlant = document['plantNick'];
       FlutterBlue flutterBlue = FlutterBlue.instance;
       flutterBlue.startScan(timeout: Duration(seconds: 4));
       // Listen to scan results
@@ -131,6 +133,14 @@ class HomeScreenState extends State<HomeScreen> {
 
           // 1. 수분값 매핑
           double moisturePercent = 1 - ((moistureInt - 100) / 400);
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+              .collection('PlantInventory')
+              .doc(wateringPlant)
+              .update({
+            'watering': (moisturePercent * 100).toStringAsFixed(1) + "%",
+          });
 
           // 2. 0~25: 모닥불, 25~50: 귀뚜라미, 50~75: 새소리, 75~100: 강물
           if (moisturePercent < 0.25) {
@@ -570,7 +580,7 @@ class HomeScreenState extends State<HomeScreen> {
                         document.get('B612') != ""
                             ? Container(
                                 child: Text(
-                                  '수분량: ${document.get('watering')}',
+                                  '수분량 : ${document.get('watering')}',
                                   style: TextStyle(color: primaryColor),
                                 ),
                                 alignment: Alignment.centerLeft,

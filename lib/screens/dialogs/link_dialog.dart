@@ -187,6 +187,14 @@ void _bluetoothReceiveCallback(value) {
 
         // 1. 수분값 매핑
         double moisturePercent = 1 - ((moistureInt - 100) / 400);
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+            .collection('PlantInventory')
+            .doc(selectedPlantNick)
+            .update({
+          'watering': (moisturePercent * 100).toStringAsFixed(1) + "%",
+        });
 
         // 2. 0~25: 모닥불, 25~50: 귀뚜라미, 50~75: 새소리, 75~100: 강물
         if (moisturePercent < 0.25) {

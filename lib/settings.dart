@@ -166,7 +166,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       'plantNick': nickname,
       'plantName': aboutMe,
       'plantUrl': photoUrl,
-      'watering': "",
+      'watering': "데이터 없음",
       'B612': "",
     }).then((data) async {
       await prefs.setString('plantNick', nickname);

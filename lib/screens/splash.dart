@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Timer(Duration(seconds: 2), () async {
       Get.off(
-        LoginScreen(title: 'DEAR PLANT'),
+        LoginScreen(),
       );
     });
     super.initState();

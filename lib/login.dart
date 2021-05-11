@@ -1,175 +1,90 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dearplant/const.dart';
-import 'package:dearplant/home.dart';
-import 'package:dearplant/widget/loading.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dearplant/chat.dart';
+
+// Import kakao sdk
+import 'package:kakao_flutter_sdk/auth.dart';
+import 'package:kakao_flutter_sdk/user.dart';
+import 'package:kakao_flutter_sdk/common.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key key, @required this.title}) : super(key: key);
-
-  final String title;
-
   @override
-  LoginScreenState createState() => LoginScreenState();
+  State<StatefulWidget> createState() {
+    return _LoginState();
+  }
 }
 
-class LoginScreenState extends State<LoginScreen> {
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  SharedPreferences prefs;
-
-  bool isLoading = false;
-  bool isLoggedIn = false;
-  User currentUser;
-
+class _LoginState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    isSignedIn();
+    _initKakaoTalkInstalled();
   }
 
-  void isSignedIn() async {
-    this.setState(() {
-      isLoading = true;
-    });
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
-    prefs = await SharedPreferences.getInstance();
-    var user = firebaseAuth.currentUser;
-    //isLoggedIn = await googleSignIn.isSignedIn();
-    if (user != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                //Chat(
-                //       peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
-                //       peerAvatar: "",
-                //     )),
-                HomeScreen(currentUserId: prefs.getString('id'))),
-      );
-    }
-
-    this.setState(() {
-      isLoading = false;
+  _initKakaoTalkInstalled() async {
+    final installed = await isKakaoTalkInstalled();
+    setState(() {
+      _isKakaoTalkInstalled = installed;
     });
   }
 
-  Future<Null> handleSignIn() async {
-    prefs = await SharedPreferences.getInstance();
+  bool _isKakaoTalkInstalled = true;
 
-    this.setState(() {
-      isLoading = true;
-    });
-
-    // GoogleSignInAccount googleUser = await googleSignIn.signIn();
-    // GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    // final AuthCredential credential = GoogleAuthProvider.credential(
-    //   accessToken: googleAuth.accessToken,
-    //   idToken: googleAuth.idToken,
-    // );
-
-    User firebaseUser = (await firebaseAuth.createUserWithEmailAndPassword(
-            email: "12347@gmail.com", password: "Apple123!"))
-        .user;
-    if (firebaseUser != null) {
-      // Check is already sign up
-      final QuerySnapshot result = await FirebaseFirestore.instance
-          .collection('users')
-          .where('id', isEqualTo: firebaseUser.uid)
-          .get();
-      final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
-        // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .set({
-          'nickname': firebaseUser.displayName,
-          'photoUrl': firebaseUser.photoURL,
-          'id': firebaseUser.uid,
-          'aboutMe': "",
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null
-        });
-
-        // Write data to local
-        currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', currentUser.displayName);
-        await prefs.setString('photoUrl', currentUser.photoURL);
-      } else {
-        // // Write data to local
-        // await prefs.setString('id', documents[0].data()['id']);
-        // await prefs.setString('nickname', documents[0].data()['nickname']);
-        // await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
-        // await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
-      }
-      Fluttertoast.showToast(msg: "Sign in success");
-      this.setState(() {
-        isLoading = false;
-      });
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  HomeScreen(currentUserId: firebaseUser.uid)));
-      // Chat(
-      //   peerId: "5yvcWeJEUhaj4LpGwUw9GldG9ec2",
-      //   peerAvatar: "",
-      // )));
-    } else {
-      Fluttertoast.showToast(msg: "Sign in fail");
-      this.setState(() {
-        isLoading = false;
-      });
+  _issueAccessToken(String authCode) async {
+    try {
+      var token = await AuthApi.instance.issueAccessToken(authCode);
+      AccessTokenStore.instance.toStore(token);
+      Navigator.pushNamed(context, '/login_result');
+    } catch (e) {
+      print("error on issuing access token: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.title,
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-        ),
-        body: Stack(
-          children: <Widget>[
-            Center(
-              child: FlatButton(
-                  onPressed: () => handleSignIn().catchError((err) {
-                        Fluttertoast.showToast(msg: "Sign in fail");
-                        this.setState(() {
-                          isLoading = false;
-                        });
-                      }),
-                  child: Text(
-                    'SIGN IN WITH GOOGLE',
-                    style: TextStyle(fontSize: 16.0),
-                  ),
-                  color: Color(0xffdd4b39),
-                  highlightColor: Color(0xffff7f7f),
-                  splashColor: Colors.transparent,
-                  textColor: Colors.white,
-                  padding: EdgeInsets.fromLTRB(30.0, 15.0, 30.0, 15.0)),
-            ),
+    // KaKao native app key
+    KakaoContext.clientId = "c48f6ed29e056cad7cd259ee9b1ec8d3";
+    // KaKao javascript key
+    KakaoContext.javascriptClientId = "aab1feff3aa701813c6e7a1c0ae40adc";
 
-            // Loading
-            Positioned(
-              child: isLoading ? const Loading() : Container(),
-            ),
-          ],
-        ));
+    isKakaoTalkInstalled();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Kakao Flutter SDK Login"),
+        actions: [],
+      ),
+      body: Center(
+          child: Column(
+        children: <Widget>[
+          RaisedButton(child: Text("Login"), onPressed: _loginWithKakao),
+          RaisedButton(
+              child: Text("Login with Talk"),
+              onPressed: _isKakaoTalkInstalled ? _loginWithTalk : null),
+        ],
+      )),
+    );
+  }
+
+  _loginWithKakao() async {
+    try {
+      var code = await AuthCodeClient.instance.request();
+      await _issueAccessToken(code);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  _loginWithTalk() async {
+    try {
+      var code = await AuthCodeClient.instance.requestWithTalk();
+      await _issueAccessToken(code);
+    } catch (e) {
+      print(e);
+    }
   }
 }
