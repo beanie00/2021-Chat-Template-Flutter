@@ -31,6 +31,7 @@ import 'models/music_theme_model.dart';
 
 var selectedPlantNick = '';
 var wateringPlant = '';
+var touch_time = DateTime.utc(2021, DateTime.april, 30);
 BluetoothDevice gConnectedDevice;
 BluetoothCharacteristic gConnectedCharacteristic;
 SharedPreferences prefs;
@@ -174,8 +175,12 @@ class HomeScreenState extends State<HomeScreen> {
       } else if ((0 <= element) && (element < 20)) {
         // int 0~20, touch data
         if (element >= 10) {
-          HttpController.sendTouchEvent(
-              email: prefs.getString('nickname'), nick: wateringPlant);
+          var now = DateTime.now();
+          if (now.difference(touch_time).inMinutes >= 5) {
+            HttpController.sendTouchEvent(
+                email: prefs.getString('nickname'), nick: wateringPlant);
+            touch_time = DateTime.now();
+          }
         }
 
         if (countOfLinefeed < 2) {

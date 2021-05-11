@@ -12,7 +12,7 @@ class HttpController {
       {@required String moisture,
       @required String email,
       @required String nick}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/plant/dearplant/moisture';
+    var url = 'http://a006b52109d4.ngrok.io/plant/dearplant/moisture';
 
     Map data = {'moisture': moisture, 'email': email, 'nick': nick};
 
@@ -26,7 +26,7 @@ class HttpController {
 
   static Future<void> sendTouchEvent(
       {@required String email, @required String nick}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/plant/dearplant/touch';
+    var url = 'http://a006b52109d4.ngrok.io/plant/dearplant/touch';
 
     Map data = {'email': email, 'nick': nick};
 
@@ -42,7 +42,7 @@ class HttpController {
       {@required String nick,
       @required String typename,
       @required String email}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/plant/dearplant';
+    var url = 'http://a006b52109d4.ngrok.io/plant/dearplant';
 
     Map data = {'nick': nick, 'typename': typename, 'email': email};
 
@@ -56,7 +56,7 @@ class HttpController {
 
   static Future<void> signUp(
       {@required String email, @required String fcmId}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/account/dearplant/sign-up';
+    var url = 'http://a006b52109d4.ngrok.io/account/dearplant/sign-up';
 
     Map data = {'email': email, 'fcm_id': fcmId};
     //encode Map to JSON
@@ -66,7 +66,7 @@ class HttpController {
   }
 
   static Future<void> signIn({@required String email}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/account/dearplant/sign-in';
+    var url = 'http://a006b52109d4.ngrok.io/account/dearplant/sign-in';
 
     Map data = {'email': email};
     //encode Map to JSON
@@ -76,7 +76,7 @@ class HttpController {
   }
 
   static Future<void> getPlantNameAll() async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/plant/dearplantsearch';
+    var url = 'http://a006b52109d4.ngrok.io/plant/dearplantsearch';
 
     print('url : $url');
 
@@ -97,7 +97,7 @@ class HttpController {
       @required String id,
       @required String peerId,
       @required int type}) async {
-    var url = 'http://e6ad832aeaa6.ngrok.io/chat/dearplant?nick=' +
+    var url = 'http://a006b52109d4.ngrok.io/chat/dearplant?nick=' +
         nick +
         '&message=' +
         message +
