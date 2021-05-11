@@ -6,11 +6,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dearplant/const.dart';
+import 'package:dearplant/login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/app_colors.dart';
+import 'controllers/http_controller.dart';
 
 class ChatSettings extends StatelessWidget {
   @override
@@ -37,10 +39,13 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> {
   TextEditingController controllerNickname;
   TextEditingController controllerAboutMe;
+  TextEditingController editingController = TextEditingController();
+  final duplicateItems = plantNameAll;
+  var items = List<String>();
 
   SharedPreferences prefs;
 
-  String id = '5yvcWeJEUhaj4LpGwUw9GldG9ec2';
+  String id = fireUserUid;
   String nickname = '';
   String aboutMe = '';
   String photoUrl = '';
@@ -55,26 +60,23 @@ class SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     readLocal();
+    //items.addAll(duplicateItems);
   }
 
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    // id = prefs.getString('id') ?? '';
-    // nickname = prefs.getString('nickname') ?? '';
-    // aboutMe = prefs.getString('aboutMe') ?? '';
-    // photoUrl = prefs.getString('photoUrl') ?? '';
-
-    controllerNickname = TextEditingController(text: nickname);
-    controllerAboutMe = TextEditingController(text: aboutMe);
+    id = prefs.getString('id') ?? '';
 
     // Force refresh input
     setState(() {});
   }
 
   Future getImage() async {
+    print("AAAAA");
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
 
+    print("BBBBB");
     pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
 
     File image = File(pickedFile.path);
@@ -85,10 +87,13 @@ class SettingsScreenState extends State<SettingsScreen> {
         isLoading = true;
       });
     }
+    print("CCCCC");
     uploadFile();
   }
 
   Future uploadFile() async {
+    print("DDDDD");
+    print("firebase_id : " + id);
     String plantId = FirebaseFirestore.instance
         .collection('users')
         .doc(id)
@@ -107,27 +112,6 @@ class SettingsScreenState extends State<SettingsScreen> {
         setState(() {
           isLoading = false;
         });
-        // FirebaseFirestore.instance
-        //     .collection('users')
-        //     .doc(id)
-        //     .collection('PlantInventory')
-        //     .add({
-        //   'plantNick': nickname,
-        //   'plantName': aboutMe,
-        //   'plantUrl': photoUrl,
-        //   'watering': ""
-        // }).then((data) async {
-        //   await prefs.setString('photoUrl', photoUrl);
-        //   setState(() {
-        //     isLoading = false;
-        //   });
-
-        // }).catchError((err) {
-        //   setState(() {
-        //     isLoading = false;
-        //   });
-        //   Fluttertoast.showToast(msg: err.toString());
-        // });
       }, onError: (err) {
         setState(() {
           isLoading = false;
@@ -157,9 +141,11 @@ class SettingsScreenState extends State<SettingsScreen> {
       isLoading = true;
     });
 
+    aboutMe = editingController.text;
+
     FirebaseFirestore.instance
         .collection('users')
-        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .doc(fireUserUid)
         .collection('PlantInventory')
         .doc(nickname)
         .set({
@@ -186,6 +172,29 @@ class SettingsScreenState extends State<SettingsScreen> {
 
       Fluttertoast.showToast(msg: err.toString());
     });
+  }
+
+  void filterSearchResults(String query) {
+    List<String> dummySearchList = List<String>();
+    dummySearchList.addAll(duplicateItems);
+    if (query.isNotEmpty) {
+      List<String> dummyListData = List<String>();
+      dummySearchList.forEach((item) {
+        if (item.contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        items.clear();
+        items.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        items.clear();
+        items.addAll(duplicateItems);
+      });
+    }
   }
 
   @override
@@ -304,24 +313,62 @@ class SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
                   ),
                   Container(
-                    child: Theme(
-                      data: Theme.of(context)
-                          .copyWith(primaryColor: primaryColor),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: '식물 종을 선택해주세요.',
-                          contentPadding: EdgeInsets.all(5.0),
-                          hintStyle: TextStyle(color: greyColor),
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            onChanged: (value) {
+                              filterSearchResults(value);
+                            },
+                            controller: editingController,
+                            decoration: InputDecoration(
+                                labelText: "식물 종을 선택해주세요.",
+                                hintText: "Search",
+                                prefixIcon: Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(25.0)))),
+                          ),
                         ),
-                        controller: controllerAboutMe,
-                        onChanged: (value) {
-                          aboutMe = value;
-                        },
-                        focusNode: focusNodeAboutMe,
-                      ),
+                        SizedBox(
+                          height: 100,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text('${items[index]}'),
+                                onTap: () {
+                                  editingController.text = items[index];
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    margin: EdgeInsets.only(left: 30.0, right: 30.0),
                   ),
+                  // Container(
+                  //   child: Theme(
+                  //     data: Theme.of(context)
+                  //         .copyWith(primaryColor: primaryColor),
+                  //     child: TextField(
+                  //       onChanged: (value) {
+                  //         filterSearchResults(value);
+                  //       },
+                  //       controller: editingController,
+                  //       decoration: InputDecoration(
+                  //           labelText: "Search",
+                  //           hintText: "식물 종을 선택해주세요.",
+                  //           prefixIcon: Icon(Icons.search),
+                  //           border: OutlineInputBorder(
+                  //               borderRadius:
+                  //                   BorderRadius.all(Radius.circular(25.0)))),
+                  //     ),
+                  //   ),
+                  //   margin: EdgeInsets.only(left: 30.0, right: 30.0),
+                  // ),
                 ],
                 crossAxisAlignment: CrossAxisAlignment.start,
               ),

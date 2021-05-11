@@ -24,6 +24,7 @@ import 'constants/music_theme.dart';
 import 'controllers/app_data.dart';
 import 'controllers/http_controller.dart';
 import 'controllers/sound_controller.dart';
+import 'login.dart';
 import 'main.dart';
 import 'models/music_theme_model.dart';
 
@@ -64,10 +65,11 @@ class HomeScreenState extends State<HomeScreen> {
     super.initState();
     //registerNotification();
     //configLocalNotification();
+    HttpController.getPlantNameAll();
     listScrollController.addListener(scrollListener);
     FirebaseFirestore.instance
         .collection('users')
-        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .doc(currentUserId)
         .collection('PlantInventory')
         .get()
         .then((QuerySnapshot ds) {
@@ -135,7 +137,7 @@ class HomeScreenState extends State<HomeScreen> {
           double moisturePercent = 1 - ((moistureInt - 100) / 400);
           FirebaseFirestore.instance
               .collection('users')
-              .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+              .doc(fireUserUid)
               .collection('PlantInventory')
               .doc(wateringPlant)
               .update({
@@ -452,7 +454,7 @@ class HomeScreenState extends State<HomeScreen> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('users')
-                    .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+                    .doc(currentUserId)
                     .collection('PlantInventory')
                     .limit(_limit)
                     .snapshots(),

@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 
 import '../../const.dart';
 import '../../home.dart';
+import '../../login.dart';
 
 String moistureString = '';
 int moistureInt = 0;
@@ -97,7 +98,7 @@ class _LinkDialogState extends State<LinkDialog> {
                           await r.device.discoverServices();
                           FirebaseFirestore.instance
                               .collection('users')
-                              .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+                              .doc(fireUserUid)
                               .collection('PlantInventory')
                               .get()
                               .then((QuerySnapshot ds) {
@@ -152,7 +153,7 @@ void setB612(DocumentSnapshot document) {
   if (document['plantNick'] == selectedPlantNick) {
     FirebaseFirestore.instance
         .collection('users')
-        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .doc(fireUserUid)
         .collection('PlantInventory')
         .doc(document['plantNick'])
         .update({
@@ -161,7 +162,7 @@ void setB612(DocumentSnapshot document) {
   } else {
     FirebaseFirestore.instance
         .collection('users')
-        .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+        .doc(fireUserUid)
         .collection('PlantInventory')
         .doc(document['plantNick'])
         .update({
@@ -189,7 +190,7 @@ void _bluetoothReceiveCallback(value) {
         double moisturePercent = 1 - ((moistureInt - 100) / 400);
         FirebaseFirestore.instance
             .collection('users')
-            .doc('5yvcWeJEUhaj4LpGwUw9GldG9ec2')
+            .doc(fireUserUid)
             .collection('PlantInventory')
             .doc(selectedPlantNick)
             .update({

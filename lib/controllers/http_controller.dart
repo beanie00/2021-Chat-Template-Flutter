@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
+List<String> plantNameAll;
+
 class HttpController {
   static Future<void> sendMoistureToServer(
       {@required String deviceId, @required double moisture}) async {
@@ -18,6 +20,19 @@ class HttpController {
     http.Response response = await http.post(
       Uri.parse(url),
     );
+  }
+
+  static Future<void> getPlantNameAll() async {
+    var url = 'http://cebb2c6b5bee.ngrok.io/plant/dearplantsearch';
+
+    print('url : $url');
+
+    http.Response response = await http.get(
+      Uri.parse(url),
+    );
+    if (response.statusCode == 200) {
+      plantNameAll = json.decode(response.body)['data'].cast<String>();
+    }
   }
 
   //기기번호 //식물 ID
