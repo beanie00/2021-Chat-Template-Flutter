@@ -138,6 +138,8 @@ class HomeScreenState extends State<HomeScreen> {
           MusicThemeModel newMusic;
           moistureInt = int.parse(moistureString);
           print('moisture: $moistureInt');
+          print('email: ' + prefs.getString('nickname'));
+          print('nickname: ' + wateringPlant);
 
           // 1. 수분값 매핑
           double moisturePercent = 1 - ((moistureInt - 100) / 400);
@@ -676,7 +678,8 @@ class HomeScreenState extends State<HomeScreen> {
                             controller: listScrollController,
                           )),
                           IconButton(
-                            icon: new Image.asset("images/register_plant.png"),
+                            icon: new Image.asset(
+                                "assets/images/register_plant.png"),
                             onPressed: () {
                               Navigator.push(
                                   context,

@@ -177,14 +177,23 @@ void _bluetoothReceiveCallback(value) {
   value.forEach((element) {
     if ((48 < element) && (element < 57)) {
       // ascii 0~9, moisture data
+      print("moistureString2: " + moistureString);
       moistureString += String.fromCharCode(element);
       if (moistureString.length == 3) {
         MusicThemeModel newMusic;
         moistureInt = int.parse(moistureString);
-        print('moisture: $moistureInt');
+        print('moisture2: $moistureInt');
+        print('email2: ' + prefs.getString('nickname'));
+        print('nickname2: ' + wateringPlant);
 
         // 1. 수분값 매핑
         double moisturePercent = 1 - ((moistureInt - 100) / 400);
+
+        HttpController.sendMoistureToServer(
+            moisture: (moisturePercent * 100).toString(),
+            email: prefs.getString('nickname'),
+            nick: wateringPlant);
+
         FirebaseFirestore.instance
             .collection('users')
             .doc(fireUserUid)
@@ -193,11 +202,6 @@ void _bluetoothReceiveCallback(value) {
             .update({
           'watering': (moisturePercent * 100).toStringAsFixed(1) + "%",
         });
-
-        HttpController.sendMoistureToServer(
-            moisture: (moisturePercent * 100).toString(),
-            email: prefs.getString('nickname'),
-            nick: wateringPlant);
 
         if (appData.isMuted) {
           return;

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -89,16 +90,16 @@ class SettingsScreenState extends State<SettingsScreen> {
     uploadFile();
   }
 
+  static const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  Random _rnd = Random();
+
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+
   Future uploadFile() async {
     print("firebase_id : " + id);
-    String plantId = FirebaseFirestore.instance
-        .collection('users')
-        .doc(id)
-        .collection('PlantInventory')
-        .snapshots()
-        .length
-        .toString();
-    String fileName = plantId;
+    String fileName = id + getRandomString(10);
     FirebaseStorage storage = FirebaseStorage.instance;
     Reference ref = storage.ref().child(fileName);
     UploadTask uploadTask = ref.putFile(avatarImageFile);
