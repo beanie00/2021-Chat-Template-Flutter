@@ -21,6 +21,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants/app_colors.dart';
+import 'constants/app_colors.dart';
 import 'constants/music_theme.dart';
 import 'controllers/app_data.dart';
 import 'controllers/http_controller.dart';
@@ -59,7 +60,7 @@ class HomeScreenState extends State<HomeScreen> {
   int _limitIncrement = 20;
   bool isLoading = false;
   List<Choice> choices = const <Choice>[
-    const Choice(title: '식물 등록', icon: Icons.settings),
+    const Choice(title: '식물 등록', icon: Icons.add),
     //const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
@@ -275,7 +276,7 @@ class HomeScreenState extends State<HomeScreen> {
       handleSignOut();
     } else {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChatSettings()));
+          context, MaterialPageRoute(builder: (context) => RegisterPlant()));
     }
   }
 
@@ -338,7 +339,7 @@ class HomeScreenState extends State<HomeScreen> {
                       'Exit app',
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18.0,
+                          fontSize: 17.0,
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -519,41 +520,55 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.purple,
-        automaticallyImplyLeading: false,
-        title: Text(
-          '나의 식물 친구',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: null,
-        actions: <Widget>[
-          PopupMenuButton<Choice>(
-            onSelected: onItemMenuPress,
-            itemBuilder: (BuildContext context) {
-              return choices.map((Choice choice) {
-                return PopupMenuItem<Choice>(
-                    value: choice,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          choice.icon,
-                          color: primaryColor,
-                        ),
-                        Container(
-                          width: 10.0,
-                        ),
-                        Text(
-                          choice.title,
-                          style: TextStyle(color: primaryColor),
-                        ),
-                      ],
-                    ));
-              }).toList();
-            },
+          backgroundColor: AppColors.purple,
+          automaticallyImplyLeading: false,
+          toolbarHeight: 55,
+          title: Image.asset('assets/images/dearplant_white.webp',
+              height: 37, fit: BoxFit.contain),
+          // Text(
+          //   '나의 식물 친구',
+          //   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          // ),
+          centerTitle: true,
+          leading: null,
+          actions: <Widget>[
+            new IconButton(
+              icon: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => RegisterPlant())),
+            ),
+          ]
+
+          // <Widget>[
+          //   PopupMenuButton<Choice>(
+          //     onSelected: onItemMenuPress,
+          //     itemBuilder: (BuildContext context) {
+          //       return choices.map((Choice choice) {
+          //         return PopupMenuItem<Choice>(
+          //             value: choice,
+          //             child: Row(
+          //               children: <Widget>[
+          //                 Icon(
+          //                   choice.icon,
+          //                   color: primaryColor,
+          //                 ),
+          //                 Container(
+          //                   width: 10.0,
+          //                 ),
+          //                 Text(
+          //                   choice.title,
+          //                   style: TextStyle(color: primaryColor),
+          //                 ),
+          //               ],
+          //             ));
+          //       }).toList();
+          //     },
+          //   ),
+          // ],
           ),
-        ],
-      ),
       body: WillPopScope(
         child: Stack(
           children: <Widget>[
@@ -575,19 +590,84 @@ class HomeScreenState extends State<HomeScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                      ),
-                    );
+                    return Container();
+                    // Container(
+                    //   width: double.infinity,
+                    //   child: Column(
+                    //     children: [
+                    //     IconButton(
+                    //       icon: new Image.asset(
+                    //           "assets/images/register_plant.jpg",
+                    //           width: 100,
+                    //           height: 100),
+                    //       onPressed: () {
+                    //         Navigator.push(
+                    //             context,
+                    //             MaterialPageRoute(
+                    //                 builder: (context) => RegisterPlant()));
+                    //       },
+                    //     ),
+                    //     Text(
+                    //       '식물 친구 등록하기',
+                    //       style: TextStyle(color: Colors.white, fontSize: 13),
+                    //     ),
+                    //   ]),
+                    // );
                   } else {
-                    return ListView.builder(
-                      padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) =>
-                          buildItem(context, snapshot.data.docs[index], index),
-                      itemCount: snapshot.data.docs.length,
-                      controller: listScrollController,
-                    );
+                    if (snapshot.data.docs.length == 0) {
+                      return Container(
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterPlant()));
+                            }, // handle your image tap here
+                            child: Column(children: [
+                              Image.asset("assets/images/register_plant.jpg",
+                                  width: 300, height: 300, fit: BoxFit.fill),
+                              Text(
+                                '식물 친구 등록하기',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                              ),
+                            ]),
+                          ));
+                    } else {
+                      return Column(
+                        children: [
+                          SizedBox(height: 15),
+                          Text(
+                            '나의 식물 친구',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Expanded(
+                              child: ListView.builder(
+                            padding: EdgeInsets.all(10.0),
+                            itemBuilder: (context, index) => buildItem(
+                                context, snapshot.data.docs[index], index),
+                            itemCount: snapshot.data.docs.length,
+                            controller: listScrollController,
+                          )),
+                          IconButton(
+                            icon: new Image.asset("images/register_plant.jpeg"),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterPlant()));
+                            },
+                          ),
+                        ],
+                      );
+                    }
                   }
                 },
               ),
@@ -605,6 +685,13 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document, int index) {
+    String friendDay = "";
+    if (document.get('date_registered') != null) {
+      final dateRegistered = document.get('date_registered').toDate();
+      final today = DateTime.now();
+      friendDay = (today.difference(dateRegistered).inDays + 1).toString();
+    }
+
     return GestureDetector(
         onLongPress: () {
           settingPlant(document);
@@ -629,53 +716,65 @@ class HomeScreenState extends State<HomeScreen> {
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                           themeColor),
                                     ),
-                                    width: 80.0,
-                                    height: 80.0,
+                                    width: 100.0,
+                                    height: 100.0,
                                     padding: EdgeInsets.all(15.0),
                                   ),
                                   imageUrl: document.get('plantUrl'),
-                                  width: 80.0,
-                                  height: 80.0,
+                                  width: 100.0,
+                                  height: 100.0,
                                   fit: BoxFit.cover,
                                 )
                               : Icon(
                                   Icons.account_circle,
-                                  size: 80.0,
+                                  size: 100.0,
                                   color: greyColor,
                                 ),
-                          borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
                           clipBehavior: Clip.hardEdge,
                         ),
-                        document.get('B612') == ""
-                            ? Container(
-                                margin: EdgeInsets.only(top: 2),
-                                padding: EdgeInsets.only(
-                                    top: 3, bottom: 3, left: 5, right: 5),
-                                child: Text(
-                                  '',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                margin: EdgeInsets.only(top: 2),
-                                padding: EdgeInsets.only(
-                                    top: 3, bottom: 3, left: 5, right: 5),
-                                decoration: BoxDecoration(
-                                  color: AppColors.green,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(25.0)),
-                                ),
-                                child: Text(
-                                  document.get('B612'),
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                        Container(
+                          child: Text(
+                            document.get('plantNick'),
+                            style: TextStyle(
+                                color: AppColors.purple,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                          padding: EdgeInsets.only(top: 5),
+                        ),
+                        // document.get('B612') == ""
+                        //     ? Container(
+                        //         margin: EdgeInsets.only(top: 2),
+                        //         padding: EdgeInsets.only(
+                        //             top: 3, bottom: 3, left: 5, right: 5),
+                        //         child: Text(
+                        //           '',
+                        //           style: TextStyle(
+                        //             fontSize: 10,
+                        //             color: Colors.white,
+                        //           ),
+                        //         ),
+                        //       )
+                        //     : Container(
+                        //         margin: EdgeInsets.only(top: 2),
+                        //         padding: EdgeInsets.only(
+                        //             top: 3, bottom: 3, left: 5, right: 5),
+                        //         decoration: BoxDecoration(
+                        //           color: AppColors.green,
+                        //           borderRadius:
+                        //               BorderRadius.all(Radius.circular(25.0)),
+                        //         ),
+                        //         child: Text(
+                        //           document.get('B612'),
+                        //           style: TextStyle(
+                        //             fontSize: 10,
+                        //             color: Colors.white,
+                        //           ),
+                        //         ),
+                        //       ),
                       ],
                     ),
                     Flexible(
@@ -684,37 +783,66 @@ class HomeScreenState extends State<HomeScreen> {
                           children: <Widget>[
                             Container(
                               child: Text(
-                                '식물 별명: ${document.get('plantNick')}',
-                                style: TextStyle(color: primaryColor),
+                                document.get('plantName') ?? 'Not available',
+                                style: TextStyle(
+                                    color: AppColors.purple, fontSize: 15),
                               ),
                               alignment: Alignment.centerLeft,
                               margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                             ),
-                            Container(
-                              child: Text(
-                                '식물 종: ${document.get('plantName') ?? 'Not available'}',
-                                style: TextStyle(color: primaryColor),
-                              ),
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                            ),
-                            document.get('B612') != ""
+                            friendDay != ""
                                 ? Container(
                                     child: Text(
-                                      '수분량 : ${document.get('watering')}',
-                                      style: TextStyle(color: primaryColor),
+                                      '친구된지 ' + friendDay + '일',
+                                      style: TextStyle(
+                                          color: AppColors.purple,
+                                          fontSize: 15),
                                     ),
                                     alignment: Alignment.centerLeft,
                                     margin: EdgeInsets.fromLTRB(
                                         10.0, 0.0, 0.0, 0.0),
                                   )
-                                : Container(
+                                : Container(),
+                            document.get('B612') != ""
+                                ? Container(
                                     child: Text(
-                                      '',
+                                      '수분량 : ${document.get('watering')}',
+                                      style: TextStyle(
+                                          color: AppColors.purple,
+                                          fontSize: 15),
                                     ),
                                     alignment: Alignment.centerLeft,
                                     margin: EdgeInsets.fromLTRB(
                                         10.0, 0.0, 0.0, 0.0),
+                                  )
+                                : Container(),
+                            document.get('B612') == ""
+                                ? Container()
+                                : Align(
+                                    child: TextButton(
+                                      child: Text(
+                                        document.get('B612'),
+                                        style: TextStyle(
+                                            color: AppColors.purple,
+                                            fontSize: 10),
+                                        //textAlign: TextAlign.center,
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        //alignment: Alignment.centerLeft,
+                                        padding: EdgeInsets.only(
+                                            top: 1,
+                                            bottom: 1,
+                                            left: 15,
+                                            right: 15),
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(40.0),
+                                        ),
+                                      ),
+                                      onPressed: null,
+                                    ),
+                                    alignment: Alignment.centerLeft,
                                   )
                           ],
                         ),
@@ -737,13 +865,13 @@ class HomeScreenState extends State<HomeScreen> {
                         },
                         child: Text(
                           'B612 연결',
-                          style: TextStyle(color: AppColors.purple),
+                          style: TextStyle(color: Colors.white),
                           textAlign: TextAlign.center,
                         ),
                         style: OutlinedButton.styleFrom(
                           padding: EdgeInsets.only(
                               top: 10, bottom: 10, left: 40, right: 40),
-                          backgroundColor: Colors.white,
+                          backgroundColor: AppColors.purple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40.0),
                           ),
@@ -752,7 +880,8 @@ class HomeScreenState extends State<HomeScreen> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                            TextButton(
+                            Flexible(
+                                child: TextButton(
                               onPressed: () {
                                 Navigator.push(
                                     context,
@@ -764,20 +893,22 @@ class HomeScreenState extends State<HomeScreen> {
                                             )));
                               },
                               child: Text(
-                                '식물 채팅',
-                                style: TextStyle(color: AppColors.purple),
+                                '식물과 수다 떨기',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13.0),
                                 textAlign: TextAlign.center,
                               ),
                               style: OutlinedButton.styleFrom(
                                 padding: EdgeInsets.only(
-                                    top: 10, bottom: 10, left: 40, right: 40),
-                                backgroundColor: Colors.white,
+                                    top: 3, bottom: 3, left: 15, right: 15),
+                                backgroundColor: AppColors.purple,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(40.0),
                                 ),
                               ),
-                            ),
-                            TextButton(
+                            )),
+                            Flexible(
+                                child: TextButton(
                               onPressed: () {
                                 document.get('B612') == ""
                                     ? Fluttertoast.showToast(
@@ -789,19 +920,20 @@ class HomeScreenState extends State<HomeScreen> {
                                                 PlantSound()));
                               },
                               child: Text(
-                                '식물 소리 설정',
-                                style: TextStyle(color: AppColors.purple),
+                                '식물과 자연 소리 듣기',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13.0),
                                 textAlign: TextAlign.center,
                               ),
                               style: OutlinedButton.styleFrom(
                                 padding: EdgeInsets.only(
-                                    top: 10, bottom: 10, left: 40, right: 40),
-                                backgroundColor: Colors.white,
+                                    top: 3, bottom: 3, left: 15, right: 15),
+                                backgroundColor: AppColors.purple,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(40.0),
                                 ),
                               ),
-                            ),
+                            )),
                           ])
               ],
             ),

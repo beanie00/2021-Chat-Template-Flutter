@@ -37,6 +37,8 @@ class LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
+  User firebaseUser;
+  String errorMessage;
 
   @override
   void initState() {
@@ -75,11 +77,41 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    User firebaseUser = (await firebaseAuth.signInWithEmailAndPassword(
-            email: data.name, password: data.password))
-        .user;
+    try {
+      firebaseUser = (await firebaseAuth.signInWithEmailAndPassword(
+              email: data.name, password: data.password))
+          .user;
+    } catch (error) {
+      switch (error.code) {
+        case "ERROR_INVALID_EMAIL":
+          errorMessage = "이메일 형식을 확인해주세요.";
+          break;
+        case "ERROR_WRONG_PASSWORD":
+          errorMessage = "비밀번호를 확인해주세요.";
+          break;
+        case "ERROR_USER_NOT_FOUND":
+          errorMessage = "회원가입을 먼저 진행해주세요.";
+          break;
+        case "ERROR_USER_DISABLED":
+          errorMessage = "User with this email has been disabled.";
+          break;
+        case "ERROR_TOO_MANY_REQUESTS":
+          errorMessage = "Too many requests. Try again later.";
+          break;
+        case "ERROR_OPERATION_NOT_ALLOWED":
+          errorMessage = "Signing in with Email and Password is not enabled.";
+          break;
+        default:
+          errorMessage = "아이디, 비밀번호를 확인해주세요.";
+      }
+      Fluttertoast.showToast(msg: errorMessage);
+      this.setState(() {
+        isLoading = false;
+      });
+      return errorMessage;
+    }
     if (firebaseUser != null) {
-      Fluttertoast.showToast(msg: "Sign in success");
+      Fluttertoast.showToast(msg: "로그인 되었습니다.");
       this.setState(() {
         isLoading = false;
       });
@@ -97,14 +129,6 @@ class LoginScreenState extends State<LoginScreen> {
 
       return Future.delayed(Duration(milliseconds: 10)).then((_) {
         return null;
-      });
-    } else {
-      Fluttertoast.showToast(msg: "Sign in fail");
-      this.setState(() {
-        isLoading = false;
-      });
-      return Future.delayed(Duration(milliseconds: 10)).then((_) {
-        return "Sign in fail";
       });
     }
   }
@@ -153,7 +177,7 @@ class LoginScreenState extends State<LoginScreen> {
         await prefs.setString('id', firebaseUser.uid);
         await prefs.setString('nickname', data.name);
       }
-      Fluttertoast.showToast(msg: "Sign in success");
+      Fluttertoast.showToast(msg: "로그인 되었습니다.");
       this.setState(() {
         isLoading = false;
       });
@@ -202,15 +226,15 @@ class LoginScreenState extends State<LoginScreen> {
         errorColor: Colors.deepOrange,
       ),
       messages: LoginMessages(
-        usernameHint: 'Email',
-        passwordHint: 'Password',
-        confirmPasswordHint: 'Confirm',
-        loginButton: 'LOG IN',
-        signupButton: 'REGISTER',
-        forgotPasswordButton: 'Forgot password?',
+        usernameHint: '이메일',
+        passwordHint: '비밀번호',
+        confirmPasswordHint: '비밀번호 확인',
+        loginButton: '로그인',
+        signupButton: '회원가입',
+        forgotPasswordButton: '비밀번호 찾기',
         recoverPasswordButton: 'HELP ME',
         goBackButton: 'GO BACK',
-        confirmPasswordError: 'Not match!',
+        confirmPasswordError: '두 비밀번호가 일치하지 않습니다.',
         recoverPasswordDescription:
             '가입시 사용했던 이메일 주소를 입력해주시면 비밀번호 재설정 링크를 보내드립니다.',
         recoverPasswordSuccess: 'Password rescued successfully',

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:kakao_flutter_sdk/all.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'screens/bluetooth_off_screen.dart';
@@ -17,8 +16,8 @@ double gValue = 0;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  KakaoContext.clientId = "c48f6ed29e056cad7cd259ee9b1ec8d3";
-  KakaoContext.javascriptClientId = "aab1feff3aa701813c6e7a1c0ae40adc";
+  //KakaoContext.clientId = "c48f6ed29e056cad7cd259ee9b1ec8d3";
+  //KakaoContext.javascriptClientId = "aab1feff3aa701813c6e7a1c0ae40adc";
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id

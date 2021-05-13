@@ -14,6 +14,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'const.dart';
+import 'constants/app_colors.dart';
 import 'constants/app_colors.dart';
 
 class Chat extends StatelessWidget {
@@ -27,6 +29,7 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 55,
         backgroundColor: AppColors.purple,
         title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -303,12 +306,12 @@ class ChatScreenState extends State<ChatScreen> {
               ? Container(
                   child: Text(
                     document.get('content'),
-                    style: TextStyle(color: primaryColor),
+                    style: TextStyle(color: Colors.white),
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200.0,
+                  //width: 200.0,
                   decoration: BoxDecoration(
-                      color: greyColor2,
+                      color: AppColors.purple,
                       borderRadius: BorderRadius.circular(8.0)),
                   margin: EdgeInsets.only(
                       bottom: isLastMessageRight(index) ? 20.0 : 10.0,
@@ -416,12 +419,12 @@ class ChatScreenState extends State<ChatScreen> {
                   Container(
                     child: Text(
                       document.get('content'),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: primaryColor),
                     ),
                     padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                    width: 200.0,
+                    //width: 200.0,
                     decoration: BoxDecoration(
-                        color: primaryColor,
+                        color: greyColor2,
                         borderRadius: BorderRadius.circular(8.0)),
                     margin: EdgeInsets.only(left: 10.0),
                   )

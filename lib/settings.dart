@@ -15,11 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'constants/app_colors.dart';
 import 'controllers/http_controller.dart';
 
-class ChatSettings extends StatelessWidget {
+class RegisterPlant extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 55,
         backgroundColor: AppColors.purple,
         title: Text(
           '식물 등록',
@@ -153,6 +154,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       'plantName': aboutMe,
       'plantUrl': photoUrl,
       'watering': "데이터 없음",
+      'date_registered': DateTime.now(),
       'B612': "",
     }).then((data) async {
       await prefs.setString('plantNick', nickname);
@@ -276,9 +278,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     child: Text(
                       '식물 별명',
                       style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor),
+                          fontWeight: FontWeight.bold, color: AppColors.purple),
                     ),
                     margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
                   ),
@@ -307,9 +307,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     child: Text(
                       '식물 종 선택',
                       style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor),
+                          fontWeight: FontWeight.bold, color: AppColors.purple),
                     ),
                     margin: EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
                   ),
@@ -376,17 +374,21 @@ class SettingsScreenState extends State<SettingsScreen> {
 
               // Button
               Container(
-                child: FlatButton(
+                child: TextButton(
                   onPressed: handleUpdateData,
                   child: Text(
                     '등록하기',
-                    style: TextStyle(fontSize: 16.0),
+                    style: TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
                   ),
-                  color: primaryColor,
-                  highlightColor: Color(0xff8d93a0),
-                  splashColor: Colors.transparent,
-                  textColor: Colors.white,
-                  padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.only(
+                        top: 10, bottom: 10, left: 40, right: 40),
+                    backgroundColor: AppColors.purple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40.0),
+                    ),
+                  ),
                 ),
                 margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
               ),
