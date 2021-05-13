@@ -296,7 +296,7 @@ class ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Widget buildItem(int index, DocumentSnapshot document) {
+  Widget buildItem(int index, DocumentSnapshot document, BuildContext context) {
     if (document.get('idFrom') == id) {
       // Right (my message)
       return Row(
@@ -305,6 +305,8 @@ class ChatScreenState extends State<ChatScreen> {
               // Text
               ? Flexible(
                   child: Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width / 1.5),
                   child: Text(
                     document.get('content'),
                     softWrap: true,
@@ -420,6 +422,8 @@ class ChatScreenState extends State<ChatScreen> {
                 if (document.get('type') == 0)
                   Flexible(
                       child: Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width / 1.5),
                     child: Text(
                       document.get('content'),
                       softWrap: true,
@@ -818,7 +822,7 @@ class ChatScreenState extends State<ChatScreen> {
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
-                        buildItem(index, snapshot.data.docs[index]),
+                        buildItem(index, snapshot.data.docs[index], context),
                     itemCount: snapshot.data.docs.length,
                     reverse: true,
                     controller: listScrollController,
