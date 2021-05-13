@@ -45,9 +45,8 @@
                 android:value="@string/default_notification_channel_id" /> -->
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" android:icon="@mipmap/ic_launcher"/>
                 <category android:name="android.intent.category.LAUNCHER" />
-                <data android:scheme="kakaoc48f6ed29e056cad7cd259ee9b1ec8d3" android:host="oauth"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
