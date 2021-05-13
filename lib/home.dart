@@ -590,29 +590,36 @@ class HomeScreenState extends State<HomeScreen> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Container();
-                    // Container(
-                    //   width: double.infinity,
-                    //   child: Column(
-                    //     children: [
-                    //     IconButton(
-                    //       icon: new Image.asset(
-                    //           "assets/images/register_plant.jpg",
-                    //           width: 100,
-                    //           height: 100),
-                    //       onPressed: () {
-                    //         Navigator.push(
-                    //             context,
-                    //             MaterialPageRoute(
-                    //                 builder: (context) => RegisterPlant()));
-                    //       },
-                    //     ),
-                    //     Text(
-                    //       '식물 친구 등록하기',
-                    //       style: TextStyle(color: Colors.white, fontSize: 13),
-                    //     ),
-                    //   ]),
-                    // );
+                    return Container(
+                        alignment: Alignment.center,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RegisterPlant()));
+                          }, // handle your image tap here
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Image.asset("assets/images/register_plant.png",
+                                    width:
+                                        MediaQuery.of(context).size.width / 3,
+                                    height:
+                                        MediaQuery.of(context).size.width / 3,
+                                    fit: BoxFit.contain),
+                                SizedBox(height: 10),
+                                Text(
+                                  '식물 친구 등록하기',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 13),
+                                ),
+                              ]),
+                        ));
                   } else {
                     if (snapshot.data.docs.length == 0) {
                       return Container(
@@ -626,16 +633,28 @@ class HomeScreenState extends State<HomeScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => RegisterPlant()));
                             }, // handle your image tap here
-                            child: Column(children: [
-                              Image.asset("assets/images/register_plant.jpg",
-                                  width: 300, height: 300, fit: BoxFit.fill),
-                              Text(
-                                '식물 친구 등록하기',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
-                              ),
-                            ]),
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Image.asset(
+                                      "assets/images/register_plant.png",
+                                      width:
+                                          MediaQuery.of(context).size.width / 3,
+                                      height:
+                                          MediaQuery.of(context).size.width / 3,
+                                      fit: BoxFit.contain),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    '식물 친구 등록하기',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 13),
+                                  ),
+                                ]),
                           ));
+                      // child: Center(
+                      //     child: );
                     } else {
                       return Column(
                         children: [
@@ -657,7 +676,7 @@ class HomeScreenState extends State<HomeScreen> {
                             controller: listScrollController,
                           )),
                           IconButton(
-                            icon: new Image.asset("images/register_plant.jpeg"),
+                            icon: new Image.asset("images/register_plant.png"),
                             onPressed: () {
                               Navigator.push(
                                   context,

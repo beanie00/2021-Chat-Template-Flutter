@@ -381,7 +381,8 @@ class ScanResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (result.device.name.contains('PLITOR_'))
+    return (result.device.name.contains('B612_') ||
+            result.device.name.contains('PLITOR_'))
         // return true
         ? InkWell(
             onTap: result.advertisementData.connectable ? onTap : null,

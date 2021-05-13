@@ -303,20 +303,22 @@ class ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           document.get('type') == 0
               // Text
-              ? Container(
+              ? Flexible(
+                  child: Container(
                   child: Text(
                     document.get('content'),
+                    softWrap: true,
                     style: TextStyle(color: Colors.white),
                   ),
-                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                  padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                   //width: 200.0,
                   decoration: BoxDecoration(
                       color: AppColors.purple,
-                      borderRadius: BorderRadius.circular(8.0)),
+                      borderRadius: BorderRadius.circular(15.0)),
                   margin: EdgeInsets.only(
                       bottom: isLastMessageRight(index) ? 20.0 : 10.0,
                       right: 10.0),
-                )
+                ))
               : document.get("type") == 1
                   // Image
                   ? Container(
@@ -416,18 +418,20 @@ class ChatScreenState extends State<ChatScreen> {
                     clipBehavior: Clip.hardEdge,
                   ),
                 if (document.get('type') == 0)
-                  Container(
+                  Flexible(
+                      child: Container(
                     child: Text(
                       document.get('content'),
+                      softWrap: true,
                       style: TextStyle(color: primaryColor),
                     ),
-                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                    padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
                     //width: 200.0,
                     decoration: BoxDecoration(
                         color: greyColor2,
-                        borderRadius: BorderRadius.circular(8.0)),
+                        borderRadius: BorderRadius.circular(15.0)),
                     margin: EdgeInsets.only(left: 10.0),
-                  )
+                  ))
                 // document.get('type') == 0
                 //     ? Container(
                 //         child: Text(
