@@ -43,7 +43,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   TextEditingController controllerAboutMe;
   TextEditingController editingController = TextEditingController();
   final duplicateItems = plantNameAll;
-  List<String> dummyListData = List<String>();
   var items = List<String>();
 
   SharedPreferences prefs;
@@ -135,7 +134,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     } else if (aboutMe == "") {
       Fluttertoast.showToast(msg: "식물 종을 선택해주세요.");
       return;
-    } else if (!dummyListData.contains(aboutMe)) {
+    } else if (!plantNameAll.contains(aboutMe)) {
       Fluttertoast.showToast(msg: "현재 검색되는 식물종으로만 식물 등록이 가능합니다.");
       return;
     }
@@ -192,6 +191,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   void filterSearchResults(String query) {
     List<String> dummySearchList = List<String>();
+    List<String> dummyListData = List<String>();
     dummySearchList.addAll(duplicateItems);
     if (query.isNotEmpty) {
       dummySearchList.forEach((item) {

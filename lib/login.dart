@@ -139,10 +139,17 @@ class LoginScreenState extends State<LoginScreen> {
     this.setState(() {
       isLoading = true;
     });
-
-    User firebaseUser = (await firebaseAuth.createUserWithEmailAndPassword(
-            email: data.name, password: data.password))
-        .user;
+    try {
+      firebaseUser = (await firebaseAuth.createUserWithEmailAndPassword(
+              email: data.name, password: data.password))
+          .user;
+    } catch (error) {
+      Fluttertoast.showToast(msg: error.toString());
+      this.setState(() {
+        isLoading = false;
+      });
+      return error.toString();
+    }
     if (firebaseUser != null) {
       // Check is already sign up
       fireUserUid = firebaseUser.uid;
