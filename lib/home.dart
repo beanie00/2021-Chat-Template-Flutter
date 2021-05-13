@@ -130,7 +130,8 @@ class HomeScreenState extends State<HomeScreen> {
     AppData appData = Get.find<AppData>();
     value.forEach((element) {
       //_showNotification();
-      if ((48 < element) && (element < 57)) {
+      //print("element: " + element);
+      if ((48 <= element) && (element <= 57)) {
         // ascii 0~9, moisture data
         moistureString += String.fromCharCode(element);
         print("moistureString: " + moistureString);
@@ -677,16 +678,25 @@ class HomeScreenState extends State<HomeScreen> {
                             itemCount: snapshot.data.docs.length,
                             controller: listScrollController,
                           )),
-                          IconButton(
-                            icon: new Image.asset(
-                                "assets/images/register_plant.png"),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RegisterPlant()));
-                            },
-                          ),
+                          // Column(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     crossAxisAlignment: CrossAxisAlignment.stretch,
+                          //     children: [
+                          //       Image.asset("assets/images/register_plant.png",
+                          //           width:
+                          //               MediaQuery.of(context).size.width / 4,
+                          //           height:
+                          //               MediaQuery.of(context).size.width / 4,
+                          //           fit: BoxFit.contain),
+                          //       SizedBox(height: 10),
+                          //       Text(
+                          //         '식물 친구 등록하기',
+                          //         textAlign: TextAlign.center,
+                          //         style: TextStyle(
+                          //             color: Colors.white, fontSize: 13),
+                          //       ),
+                          //       SizedBox(height: 10)
+                          //     ]),
                         ],
                       );
                     }

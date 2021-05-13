@@ -175,7 +175,7 @@ void setB612(DocumentSnapshot document) {
 void _bluetoothReceiveCallback(value) {
   AppData appData = Get.find<AppData>();
   value.forEach((element) {
-    if ((48 < element) && (element < 57)) {
+    if ((48 <= element) && (element <= 57)) {
       // ascii 0~9, moisture data
       print("moistureString2: " + moistureString);
       moistureString += String.fromCharCode(element);
@@ -184,7 +184,7 @@ void _bluetoothReceiveCallback(value) {
         moistureInt = int.parse(moistureString);
         print('moisture2: $moistureInt');
         print('email2: ' + prefs.getString('nickname'));
-        print('nickname2: ' + wateringPlant);
+        print('nickname2: ' + selectedPlantNick);
 
         // 1. 수분값 매핑
         double moisturePercent = 1 - ((moistureInt - 100) / 400);
@@ -192,7 +192,7 @@ void _bluetoothReceiveCallback(value) {
         HttpController.sendMoistureToServer(
             moisture: (moisturePercent * 100).toString(),
             email: prefs.getString('nickname'),
-            nick: wateringPlant);
+            nick: selectedPlantNick);
 
         FirebaseFirestore.instance
             .collection('users')
