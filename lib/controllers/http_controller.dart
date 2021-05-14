@@ -28,6 +28,9 @@ class HttpController {
       {@required String email, @required String nick}) async {
     var url = 'https://api.dearplants.co.kr/plant/dearplant/touch';
 
+    print("touch event email" + email);
+    print("touch event nick" + nick);
+
     Map data = {'email': email, 'nick': nick};
 
     print('url : $url');

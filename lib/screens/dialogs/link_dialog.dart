@@ -223,6 +223,15 @@ void _bluetoothReceiveCallback(value) {
     } else if ((0 <= element) && (element < 20)) {
       // int 0~20, touch data
 
+      if (element >= 10) {
+        var now = DateTime.now();
+        if (now.difference(touch_time).inMinutes >= 5) {
+          HttpController.sendTouchEvent(
+              email: prefs.getString('nickname'), nick: wateringPlant);
+          touch_time = DateTime.now();
+        }
+      }
+
       if (countOfLinefeed < 2) {
         // exception: linefeed & carrige return value
         countOfLinefeed++;
