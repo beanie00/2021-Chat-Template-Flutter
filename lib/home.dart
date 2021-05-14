@@ -416,7 +416,9 @@ class HomeScreenState extends State<HomeScreen> {
               SimpleDialogOption(
                 onPressed: () {
                   AppData appData = Get.find<AppData>();
-                  gConnectedDevice.disconnect();
+                  if (gConnectedDevice != null) {
+                    gConnectedDevice.disconnect();
+                  }
                   appData.isMuted = false;
                   appData.isMusicPlaying = false;
                   SoundController.stop();

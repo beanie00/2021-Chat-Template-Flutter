@@ -227,7 +227,7 @@ void _bluetoothReceiveCallback(value) {
         var now = DateTime.now();
         if (now.difference(touch_time).inMinutes >= 5) {
           HttpController.sendTouchEvent(
-              email: prefs.getString('nickname'), nick: wateringPlant);
+              email: prefs.getString('nickname'), nick: selectedPlantNick);
           touch_time = DateTime.now();
         }
       }
