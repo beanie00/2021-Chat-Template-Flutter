@@ -7,13 +7,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:dearplant/const.dart';
 import 'package:dearplant/home.dart';
-import 'package:dearplant/widget/loading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dearplant/chat.dart';
 
 import 'constants/app_colors.dart';
 import 'controllers/http_controller.dart';
@@ -51,17 +48,18 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    prefs = await SharedPreferences.getInstance();
-    var user = firebaseAuth.currentUser;
-    //isLoggedIn = await googleSignIn.isSignedIn();
-    if (user != null) {
+    Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+    prefs.then((prefs) {
       fireUserUid = prefs.getString('id');
-      //print("fireUserUid" + fireUserUid);
+    });
+    var user = firebaseAuth.currentUser;
+
+    //isLoggedIn = await googleSignIn.isSignedIn();
+    if (user != null && fireUserUid != null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                HomeScreen(currentUserId: prefs.getString('id'))),
+            builder: (context) => HomeScreen(currentUserId: fireUserUid)),
       );
     }
 

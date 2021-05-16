@@ -98,7 +98,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
   Future uploadFile() async {
-    print("firebase_id : " + id);
+    //print("firebase_id : " + id);
     String fileName = id + getRandomString(10);
     FirebaseStorage storage = FirebaseStorage.instance;
     Reference ref = storage.ref().child(fileName);
@@ -139,7 +139,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       Fluttertoast.showToast(msg: "현재 검색되는 식물종으로만 식물 등록이 가능합니다.");
       return;
     }
-    showNotification();
+    //showNotification();
     // String plantId = FirebaseFirestore.instance
     //     .collection('users')
     //     .doc(id)
@@ -351,9 +351,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                             itemBuilder: (context, index) {
                               return ListTile(
                                 title: Text('${items[index]}'),
-                                onTap: () {
-                                  editingController.text = items[index];
-                                },
+                                onTap: () =>
+                                    editingController.text = items[index],
                               );
                             },
                           ),
@@ -427,12 +426,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-Future<void> showNotification() async {
-  var android = AndroidNotificationDetails(
-      'channelId', 'channelName', 'channelDescription',
-      importance: Importance.max, priority: Priority.max);
-  var iOS = IOSNotificationDetails();
-  var platform = NotificationDetails(android: android, iOS: iOS);
+// Future<void> showNotification() async {
+//   var android = AndroidNotificationDetails(
+//       'channelId', 'channelName', 'channelDescription',
+//       importance: Importance.max, priority: Priority.max);
+//   var iOS = IOSNotificationDetails();
+//   var platform = NotificationDetails(android: android, iOS: iOS);
 
-  await FlutterLocalNotificationsPlugin().show(0, 'title', 'body', platform);
-}
+//   await FlutterLocalNotificationsPlugin().show(0, 'title', 'body', platform);
+// }

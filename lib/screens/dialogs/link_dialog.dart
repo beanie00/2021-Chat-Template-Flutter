@@ -149,8 +149,8 @@ class _LinkDialogState extends State<LinkDialog> {
 }
 
 void setB612(DocumentSnapshot document) {
-  print('setB612' + document['plantNick']);
-  print('selectedPlantNick' + selectedPlantNick);
+  print('setB612: ' + document['plantNick']);
+  print('selectedPlantNick: ' + selectedPlantNick);
   if (document['plantNick'] == selectedPlantNick) {
     FirebaseFirestore.instance
         .collection('users')
